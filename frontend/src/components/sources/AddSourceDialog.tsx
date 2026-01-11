@@ -107,6 +107,9 @@ export function AddSourceDialog({
     defaultNotebookId ? [defaultNotebookId] : []
   )
   const [selectedTransformations, setSelectedTransformations] = useState<string[]>([])
+  
+  // Key to force remount of SourceTypeStep when dialog is opened
+  const [dialogKey, setDialogKey] = useState(0)
 
   // Batch-specific state
   const [urlValidationErrors, setUrlValidationErrors] = useState<{ url: string; line: number }[]>([])
@@ -437,6 +440,9 @@ export function AddSourceDialog({
     setSelectedNotebooks(defaultNotebookId ? [defaultNotebookId] : [])
     setUrlValidationErrors([])
     setBatchProgress(null)
+    
+    // Increment key to force remount of SourceTypeStep (resets Zotero state)
+    setDialogKey(prev => prev + 1)
 
     // Reset to default transformations
     if (transformations.length > 0) {
@@ -552,6 +558,7 @@ export function AddSourceDialog({
           >
             {currentStep === 1 && (
               <SourceTypeStep
+                key={dialogKey}
                 // @ts-expect-error - Type inference issue with zod schema
                 control={control}
                 register={register}

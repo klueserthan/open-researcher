@@ -409,10 +409,10 @@ async def create_source(
                     detail=f"Zotero not configured: {str(e)}. Please set ZOTERO_API_KEY and ZOTERO_USER_ID or ZOTERO_GROUP_ID environment variables.",
                 )
             except Exception as e:
-                logger.error(f"Failed to fetch Zotero item: {e}")
+                logger.error(f"Failed to fetch Zotero item", exc_info=True)
                 raise HTTPException(
                     status_code=500,
-                    detail=f"Failed to fetch Zotero item: {str(e)}",
+                    detail="Failed to fetch Zotero item. Please try again later.",
                 )
         else:
             raise HTTPException(
@@ -1119,20 +1119,9 @@ async def search_zotero(request: ZoteroSearchRequest):
             zotero_key = item.get("key", "")
             title = data.get("title", "")
 
-            # Extract authors from creators
+            # Extract authors from creators using shared helper
             creators = data.get("creators", []) or []
-            authors = []
-            for creator in creators:
-                if not isinstance(creator, dict):
-                    continue
-                first_name = creator.get("firstName", "")
-                last_name = creator.get("lastName", "")
-                name = creator.get("name", "")  # For organizations
-                
-                if name:
-                    authors.append(name)
-                elif first_name or last_name:
-                    authors.append(f"{first_name} {last_name}".strip())
+            authors = zotero_client._extract_authors_from_creators(creators)
 
             # Extract year from date field
             date_str = data.get("date", "")

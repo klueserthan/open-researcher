@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import React, { useMemo, useState, useEffect } from "react"
 import { Control, FieldErrors, UseFormRegister, useWatch } from "react-hook-form"
 import { FileIcon, LinkIcon, FileTextIcon, BookOpenIcon, SearchIcon, LoaderIcon } from "lucide-react"
 import { FormSection } from "@/components/ui/form-section"
@@ -158,8 +158,7 @@ export function SourceTypeStep({ control, register, errors, urlValidationErrors,
       }
     } catch (error: unknown) {
       console.error('Zotero search failed:', error)
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error'
-      toast.error(`Zotero search failed: ${errorMessage}`)
+      toast.error('Zotero search failed. Please try again later.')
     } finally {
       setZoteroSearching(false)
     }
@@ -181,12 +180,20 @@ export function SourceTypeStep({ control, register, errors, urlValidationErrors,
               value={field.value || ''} 
               onValueChange={(value) => {
                 field.onChange(value as 'link' | 'upload' | 'text' | 'zotero')
-                // Reset Zotero state and clear form field when switching away
+                // Handle state cleanup when switching source types
                 if (value !== 'zotero') {
+                  // Clear Zotero-specific state and form field
                   setZoteroResults([])
                   setSelectedZoteroItem(null)
                   if (setValue) {
                     setValue('zotero_item_key', '')
+                  }
+                } else {
+                  // Clear other source type fields when switching to Zotero
+                  if (setValue) {
+                    setValue('url', '')
+                    setValue('content', '')
+                    setValue('file', undefined as unknown as FileList | File)
                   }
                 }
               }}

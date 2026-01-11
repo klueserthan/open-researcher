@@ -28,9 +28,19 @@ class ZoteroClient:
             library_type: 'user' or 'group'
             api_key: Zotero API key
         """
-        self.library_id = library_id or os.getenv("ZOTERO_USER_ID") or os.getenv("ZOTERO_GROUP_ID")
-        self.library_type = library_type or os.getenv("ZOTERO_LIBRARY_TYPE", "user")
-        self.api_key = api_key or os.getenv("ZOTERO_API_KEY")
+        # Trim whitespace from parameters if provided directly
+        self.library_id = (
+            library_id.strip() if library_id is not None
+            else os.getenv("ZOTERO_USER_ID") or os.getenv("ZOTERO_GROUP_ID")
+        )
+        self.library_type = (
+            library_type.strip() if library_type is not None
+            else os.getenv("ZOTERO_LIBRARY_TYPE", "user")
+        )
+        self.api_key = (
+            api_key.strip() if api_key is not None
+            else os.getenv("ZOTERO_API_KEY")
+        )
 
         if not self.library_id:
             raise ValueError(
@@ -77,6 +87,15 @@ class ZoteroClient:
         # Default to searching title and creator
         if search_fields is None:
             search_fields = ["title", "creator"]
+        
+        # Validate search_fields contents: only known values are meaningful
+        valid_fields = {"fulltext", "title", "creator"}
+        invalid_fields = [field for field in search_fields if field not in valid_fields]
+        if invalid_fields:
+            logger.warning(
+                f"Unrecognized search_fields provided: {invalid_fields}. Supported fields are: {sorted(valid_fields)}. "
+                f"Proceeding with {'full-text' if 'fulltext' in search_fields else 'quick'} search."
+            )
 
         logger.info(
             f"Searching Zotero library with query: '{query}' in fields: {search_fields}"
@@ -151,9 +170,9 @@ class ZoteroClient:
                 if child_data.get("itemType") == "attachment":
                     content_type = child_data.get("contentType", "")
                     if "pdf" in content_type.lower() or "document" in content_type.lower():
-                        # Check if it's a link attachment
+                        # Check if it's a link or file attachment
                         link_mode = child_data.get("linkMode")
-                        if link_mode in ["linked_url", "imported_url"]:
+                        if link_mode in ["linked_url", "imported_url", "linked_file", "imported_file"]:
                             url = child_data.get("url")
                             if url:
                                 logger.debug(f"Found attachment URL: {url}")
@@ -165,6 +184,30 @@ class ZoteroClient:
         except Exception as e:
             logger.warning(f"Error getting attachment URL: {e}")
             return None
+    
+    def _extract_authors_from_creators(self, creators: List[Dict[str, Any]]) -> List[str]:
+        """
+        Extract a list of author names from Zotero creators.
+        
+        Args:
+            creators: List of creator dictionaries from Zotero item
+            
+        Returns:
+            List of formatted author names
+        """
+        authors = []
+        for creator in creators:
+            if not isinstance(creator, dict):
+                continue
+            first_name = creator.get("firstName", "")
+            last_name = creator.get("lastName", "")
+            name = creator.get("name", "")  # For organizations
+            
+            if name:
+                authors.append(name)
+            elif first_name or last_name:
+                authors.append(f"{first_name} {last_name}".strip())
+        return authors
 
     def format_item_for_source(self, item: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -183,16 +226,7 @@ class ZoteroClient:
 
         # Extract creators (authors, editors, etc.)
         creators = data.get("creators", [])
-        authors = []
-        for creator in creators:
-            first_name = creator.get("firstName", "")
-            last_name = creator.get("lastName", "")
-            name = creator.get("name", "")  # For organizations
-            
-            if name:
-                authors.append(name)
-            elif first_name or last_name:
-                authors.append(f"{first_name} {last_name}".strip())
+        authors = self._extract_authors_from_creators(creators)
 
         # Extract abstract/content
         abstract = data.get("abstractNote", "")
