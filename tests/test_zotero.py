@@ -271,7 +271,9 @@ class TestZoteroClientExtractAuthors:
         
         authors = self.client.extract_authors_from_creators(creators)
         
-        assert authors == ["John Doe", "Jane Smith"]
+        assert len(authors) == 2
+        assert authors[0] == {"name": "John Doe", "first_name": "John", "last_name": "Doe"}
+        assert authors[1] == {"name": "Jane Smith", "first_name": "Jane", "last_name": "Smith"}
 
     def test_extract_authors_organization_name(self):
         """Test extracting organizational authors."""
@@ -282,7 +284,9 @@ class TestZoteroClientExtractAuthors:
         
         authors = self.client.extract_authors_from_creators(creators)
         
-        assert authors == ["MIT Press", "John Doe"]
+        assert len(authors) == 2
+        assert authors[0] == {"name": "MIT Press", "first_name": "", "last_name": ""}
+        assert authors[1] == {"name": "John Doe", "first_name": "John", "last_name": "Doe"}
 
     def test_extract_authors_missing_first_name(self):
         """Test extracting authors with only last name."""
@@ -293,7 +297,9 @@ class TestZoteroClientExtractAuthors:
         
         authors = self.client.extract_authors_from_creators(creators)
         
-        assert authors == ["Einstein", "Marie"]
+        assert len(authors) == 2
+        assert authors[0] == {"name": "Einstein", "first_name": "", "last_name": "Einstein"}
+        assert authors[1] == {"name": "Marie", "first_name": "Marie", "last_name": ""}
 
     def test_extract_authors_empty_list(self):
         """Test extracting from empty creators list."""
@@ -312,7 +318,9 @@ class TestZoteroClientExtractAuthors:
         
         authors = self.client.extract_authors_from_creators(creators)
         
-        assert authors == ["John Doe", "Jane Smith"]
+        assert len(authors) == 2
+        assert authors[0]["name"] == "John Doe"
+        assert authors[1]["name"] == "Jane Smith"
 
     def test_extract_authors_whitespace_handling(self):
         """Test author extraction handles whitespace correctly."""
@@ -323,9 +331,11 @@ class TestZoteroClientExtractAuthors:
         
         authors = self.client.extract_authors_from_creators(creators)
         
-        # Should strip whitespace
-        assert "John  Doe" in authors[0]
-        assert "Smith" in authors
+        # Should strip whitespace in the combined name
+        assert len(authors) == 2
+        assert "John" in authors[0]["name"]
+        assert "Doe" in authors[0]["name"]
+        assert authors[1]["name"] == "Smith"
 
 
 # ============================================================================
@@ -459,8 +469,11 @@ class TestZoteroClientFormatItem:
                 "abstractNote": "This is a test abstract.",
                 "itemType": "journalArticle",
                 "publicationTitle": "Test Journal",
+                "volume": "42",
+                "issue": "3",
                 "date": "2023",
                 "DOI": "10.1234/test",
+                "ISBN": "978-3-16-148410-0",
                 "url": "https://example.com",
                 "tags": [{"tag": "machine learning"}, {"tag": "AI"}]
             }
@@ -472,10 +485,16 @@ class TestZoteroClientFormatItem:
         assert result["title"] == "Test Article"
         assert "Test Article" in result["content"]
         assert "John Doe" in result["content"]
-        assert "This is a test abstract" in result["content"]
+        # Abstract should NOT be in content anymore
+        assert "This is a test abstract" not in result["content"]
+        # But should be in metadata
+        assert result["metadata"]["abstract"] == "This is a test abstract."
         assert result["metadata"]["item_type"] == "journalArticle"
         assert result["metadata"]["publication"] == "Test Journal"
+        assert result["metadata"]["volume"] == "42"
+        assert result["metadata"]["issue"] == "3"
         assert result["metadata"]["doi"] == "10.1234/test"
+        assert result["metadata"]["isbn"] == "978-3-16-148410-0"
         assert result["zotero_key"] == "ABC123"
 
     def test_format_item_missing_title(self):
@@ -527,8 +546,10 @@ class TestZoteroClientFormatItem:
         
         result = self.client.format_item_for_source(item)
         
-        # Should not have Abstract section
-        assert "## Abstract" not in result["content"]
+        # Abstract should not be in content
+        assert "Abstract" not in result["content"]
+        # Empty abstract in metadata
+        assert result["metadata"]["abstract"] == ""
 
 
 # ============================================================================

@@ -228,40 +228,50 @@ class ZoteroClient:
         creators = data.get("creators", [])
         authors = self.extract_authors_from_creators(creators)
 
-        # Extract abstract/content
+        # Extract abstract (for metadata only, not content)
         abstract = data.get("abstractNote", "")
 
-        # Extract metadata
+        # Extract metadata including DOI and ISBN
         metadata = {
             "item_type": data.get("itemType", ""),
             "authors": authors,
             "publication": data.get("publicationTitle", ""),
             "year": data.get("date", ""),
+            "volume": data.get("volume", ""),
+            "issue": data.get("issue", ""),
             "doi": data.get("DOI", ""),
+            "isbn": data.get("ISBN", ""),
             "url": data.get("url", ""),
+            "abstract": abstract,
             "tags": [tag.get("tag", "") for tag in data.get("tags", [])],
         }
 
-        # Build content text from metadata
+        # Build content text from metadata (without abstract)
         content_parts = [f"# {title}\n"]
         
         if authors:
-            content_parts.append(f"**Authors:** {', '.join(authors)}\n")
+            author_names = [author["name"] for author in authors]
+            content_parts.append(f"**Authors:** {', '.join(author_names)}\n")
         
         if metadata["year"]:
             content_parts.append(f"**Year:** {metadata['year']}\n")
         
         if metadata["publication"]:
-            content_parts.append(f"**Publication:** {metadata['publication']}\n")
+            pub_info = metadata["publication"]
+            if metadata["volume"]:
+                pub_info += f", Vol. {metadata['volume']}"
+            if metadata["issue"]:
+                pub_info += f", Issue {metadata['issue']}"
+            content_parts.append(f"**Publication:** {pub_info}\n")
         
         if metadata["doi"]:
             content_parts.append(f"**DOI:** {metadata['doi']}\n")
         
+        if metadata["isbn"]:
+            content_parts.append(f"**ISBN:** {metadata['isbn']}\n")
+        
         if metadata["url"]:
             content_parts.append(f"**URL:** {metadata['url']}\n")
-        
-        if abstract:
-            content_parts.append(f"\n## Abstract\n\n{abstract}\n")
 
         content = "\n".join(content_parts)
 

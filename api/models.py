@@ -350,14 +350,25 @@ class ZoteroSearchRequest(BaseModel):
         return self
 
 
+class ZoteroAuthor(BaseModel):
+    """Author information from Zotero."""
+    name: str = Field(..., description="Author full name")
+    first_name: str = Field(default="", description="Author first name")
+    last_name: str = Field(default="", description="Author last name")
+
+
 class ZoteroItemResponse(BaseModel):
     key: str = Field(..., description="Zotero item key")
     title: str = Field(..., description="Item title")
-    authors: List[str] = Field(default_factory=list, description="List of authors")
+    authors: List[ZoteroAuthor] = Field(default_factory=list, description="List of authors")
     year: str = Field(default="", description="Publication year")
     item_type: str = Field(default="", description="Item type (article, book, etc.)")
     publication: str = Field(default="", description="Publication name")
+    volume: str = Field(default="", description="Volume number")
+    issue: str = Field(default="", description="Issue number")
     abstract: str = Field(default="", description="Abstract or summary")
+    doi: str = Field(default="", description="DOI identifier")
+    isbn: str = Field(default="", description="ISBN identifier")
     url: Optional[str] = Field(None, description="Item URL")
     attachment_url: Optional[str] = Field(None, description="Attachment URL if available")
 

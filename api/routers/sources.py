@@ -1121,7 +1121,11 @@ async def search_zotero(request: ZoteroSearchRequest):
 
             # Extract authors from creators using shared helper
             creators = data.get("creators", []) or []
-            authors = zotero_client.extract_authors_from_creators(creators)
+            author_dicts = zotero_client.extract_authors_from_creators(creators)
+            
+            # Convert to ZoteroAuthor objects
+            from api.models import ZoteroAuthor
+            authors = [ZoteroAuthor(**author) for author in author_dicts]
 
             # Extract year from date field
             date_str = data.get("date", "")
@@ -1131,7 +1135,11 @@ async def search_zotero(request: ZoteroSearchRequest):
 
             item_type = data.get("itemType", "")
             publication = data.get("publicationTitle", "")
+            volume = data.get("volume", "")
+            issue = data.get("issue", "")
             abstract = data.get("abstractNote", "")
+            doi = data.get("DOI", "")
+            isbn = data.get("ISBN", "")
             url = data.get("url")
 
             results.append(
@@ -1142,7 +1150,11 @@ async def search_zotero(request: ZoteroSearchRequest):
                     year=year,
                     item_type=item_type,
                     publication=publication,
+                    volume=volume,
+                    issue=issue,
                     abstract=abstract,
+                    doi=doi,
+                    isbn=isbn,
                     url=url,
                     # Omit attachment_url to avoid N+1 API calls during search
                     attachment_url=None,
