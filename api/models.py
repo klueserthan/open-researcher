@@ -323,6 +323,14 @@ class SourceCreate(BaseModel):
 
         return self
 
+    @model_validator(mode="after")
+    def validate_source_type_fields(self):
+        # Validate that zotero_item_key is provided for zotero type
+        if self.type == "zotero" and not self.zotero_item_key:
+            raise ValueError("zotero_item_key is required for zotero type")
+        
+        return self
+
 
 class ZoteroSearchRequest(BaseModel):
     query: str = Field(..., description="Search query text")

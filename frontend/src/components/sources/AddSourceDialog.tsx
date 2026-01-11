@@ -129,6 +129,7 @@ export function AddSourceDialog({
     watch,
     formState: { errors },
     reset,
+    setValue,
   } = useForm<CreateSourceFormData>({
     resolver: zodResolver(createSourceSchema),
     defaultValues: {
@@ -558,6 +559,7 @@ export function AddSourceDialog({
                 errors={errors}
                 urlValidationErrors={urlValidationErrors}
                 onClearUrlErrors={handleClearUrlErrors}
+                setValue={setValue}
               />
             )}
             

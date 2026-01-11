@@ -100,11 +100,12 @@ interface SourceTypeStepProps {
   errors: FieldErrors<CreateSourceFormData>
   urlValidationErrors?: { url: string; line: number }[]
   onClearUrlErrors?: () => void
+  setValue?: (name: keyof CreateSourceFormData, value: any) => void
 }
 
 const MAX_BATCH_SIZE = 50
 
-export function SourceTypeStep({ control, register, errors, urlValidationErrors, onClearUrlErrors }: SourceTypeStepProps) {
+export function SourceTypeStep({ control, register, errors, urlValidationErrors, onClearUrlErrors, setValue }: SourceTypeStepProps) {
   // Watch the selected type and inputs to detect batch mode
   const selectedType = useWatch({ control, name: 'type' })
   const urlInput = useWatch({ control, name: 'url' })
@@ -368,13 +369,9 @@ export function SourceTypeStep({ control, register, errors, urlValidationErrors,
                                 }`}
                                 onClick={() => {
                                   setSelectedZoteroItem(item)
-                                  // Update form field with item key
-                                  const zoteroKeyInput = document.querySelector('input[name="zotero_item_key"]') as HTMLInputElement
-                                  if (zoteroKeyInput) {
-                                    zoteroKeyInput.value = item.key
-                                    // Trigger change event for react-hook-form
-                                    const event = new Event('input', { bubbles: true })
-                                    zoteroKeyInput.dispatchEvent(event)
+                                  // Update form field using setValue from react-hook-form
+                                  if (setValue) {
+                                    setValue('zotero_item_key', item.key)
                                   }
                                 }}
                               >
