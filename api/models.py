@@ -283,7 +283,7 @@ class SourceCreate(BaseModel):
         None, description="List of notebook IDs to add the source to"
     )
     # Required fields
-    type: str = Field(..., description="Source type: link, upload, or text")
+    type: str = Field(..., description="Source type: link, upload, text, or zotero")
     url: Optional[str] = Field(None, description="URL for link type")
     file_path: Optional[str] = Field(None, description="File path for upload type")
     content: Optional[str] = Field(None, description="Text content for text type")
@@ -298,6 +298,11 @@ class SourceCreate(BaseModel):
     # New async processing support
     async_processing: bool = Field(
         False, description="Whether to process source asynchronously"
+    )
+    # Zotero-specific fields
+    zotero_item_key: Optional[str] = Field(
+        None, description="Zotero item key for zotero type"
+    )
     )
 
     @model_validator(mode="after")
@@ -318,6 +323,27 @@ class SourceCreate(BaseModel):
             self.notebooks = []
 
         return self
+
+
+class ZoteroSearchRequest(BaseModel):
+    query: str = Field(..., description="Search query text")
+    search_fields: Optional[List[str]] = Field(
+        None,
+        description="Fields to search in: title, creator, year, tag, note, fulltext. Default: title and creator",
+    )
+    limit: int = Field(100, ge=1, le=500, description="Maximum number of results")
+
+
+class ZoteroItemResponse(BaseModel):
+    key: str = Field(..., description="Zotero item key")
+    title: str = Field(..., description="Item title")
+    authors: List[str] = Field(default_factory=list, description="List of authors")
+    year: str = Field(default="", description="Publication year")
+    item_type: str = Field(default="", description="Item type (article, book, etc.)")
+    publication: str = Field(default="", description="Publication name")
+    abstract: str = Field(default="", description="Abstract or summary")
+    url: Optional[str] = Field(None, description="Item URL")
+    attachment_url: Optional[str] = Field(None, description="Attachment URL if available")
 
 
 class SourceUpdate(BaseModel):

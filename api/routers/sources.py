@@ -25,6 +25,8 @@ from api.models import (
     SourceResponse,
     SourceStatusResponse,
     SourceUpdate,
+    ZoteroItemResponse,
+    ZoteroSearchRequest,
 )
 from commands.source_commands import SourceProcessingInput
 from open_notebook.config import UPLOADS_FOLDER
@@ -32,6 +34,7 @@ from open_notebook.database.repository import ensure_record_id, repo_query
 from open_notebook.domain.notebook import Notebook, Source
 from open_notebook.domain.transformation import Transformation
 from open_notebook.exceptions import InvalidInputError
+from open_notebook.utils.zotero_client import ZoteroClient, get_zotero_client
 
 router = APIRouter()
 
@@ -94,6 +97,7 @@ def parse_source_form_data(
     embed: str = Form("false"),  # Accept as string, convert to bool
     delete_source: str = Form("false"),  # Accept as string, convert to bool
     async_processing: str = Form("false"),  # Accept as string, convert to bool
+    zotero_item_key: Optional[str] = Form(None),  # Zotero item key for zotero type
     file: Optional[UploadFile] = File(None),
 ) -> tuple[SourceCreate, Optional[UploadFile]]:
     """Parse form data into SourceCreate model and return upload file separately."""
@@ -140,6 +144,7 @@ def parse_source_form_data(
             embed=embed_bool,
             delete_source=delete_source_bool,
             async_processing=async_processing_bool,
+            zotero_item_key=zotero_item_key,
         )
         pass  # SourceCreate instance created successfully
     except Exception as e:
@@ -370,10 +375,49 @@ async def create_source(
                     status_code=400, detail="Content is required for text type"
                 )
             content_state["content"] = source_data.content
+        elif source_data.type == "zotero":
+            # Handle Zotero source type
+            if not source_data.zotero_item_key:
+                raise HTTPException(
+                    status_code=400, detail="Zotero item key is required for zotero type"
+                )
+            
+            try:
+                # Get Zotero client
+                zotero_client = get_zotero_client()
+                
+                # Fetch item from Zotero
+                item = zotero_client.get_item(source_data.zotero_item_key)
+                
+                # Format item for source creation
+                formatted = zotero_client.format_item_for_source(item)
+                
+                # Use the formatted content as text content
+                content_state["content"] = formatted.get("content", "")
+                
+                # Override title if not provided
+                if not source_data.title:
+                    source_data.title = formatted.get("title")
+                
+                # Store URL if available (for attachment or item URL)
+                if formatted.get("url"):
+                    content_state["url"] = formatted.get("url")
+                    
+            except ValueError as e:
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"Zotero not configured: {str(e)}",
+                )
+            except Exception as e:
+                logger.error(f"Failed to fetch Zotero item: {e}")
+                raise HTTPException(
+                    status_code=500,
+                    detail=f"Failed to fetch Zotero item: {str(e)}",
+                )
         else:
             raise HTTPException(
                 status_code=400,
-                detail="Invalid source type. Must be link, upload, or text",
+                detail="Invalid source type. Must be link, upload, text, or zotero",
             )
 
         # Validate transformations exist
@@ -1038,3 +1082,58 @@ async def create_source_insight(source_id: str, request: CreateSourceInsightRequ
     except Exception as e:
         logger.error(f"Error creating insight for source {source_id}: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Error creating insight: {str(e)}")
+
+
+@router.post("/sources/zotero/search", response_model=List[ZoteroItemResponse])
+async def search_zotero(request: ZoteroSearchRequest):
+    """Search Zotero library for documents."""
+    try:
+        # Get Zotero client
+        try:
+            zotero_client = get_zotero_client()
+        except ValueError as e:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Zotero not configured: {str(e)}. Please set ZOTERO_API_KEY and ZOTERO_USER_ID or ZOTERO_GROUP_ID environment variables.",
+            )
+
+        # Perform search
+        try:
+            items = zotero_client.search(
+                query=request.query,
+                search_fields=request.search_fields,
+                limit=request.limit,
+            )
+        except Exception as e:
+            logger.error(f"Zotero search failed: {e}")
+            raise HTTPException(
+                status_code=500, detail=f"Zotero search failed: {str(e)}"
+            )
+
+        # Format results
+        results = []
+        for item in items:
+            formatted = zotero_client.format_item_for_source(item)
+            metadata = formatted.get("metadata", {})
+
+            results.append(
+                ZoteroItemResponse(
+                    key=formatted.get("zotero_key", ""),
+                    title=formatted.get("title", ""),
+                    authors=metadata.get("authors", []),
+                    year=metadata.get("year", ""),
+                    item_type=metadata.get("item_type", ""),
+                    publication=metadata.get("publication", ""),
+                    abstract=item.get("data", {}).get("abstractNote", ""),
+                    url=metadata.get("url"),
+                    attachment_url=formatted.get("url"),
+                )
+            )
+
+        return results
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error searching Zotero: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error searching Zotero: {str(e)}")
