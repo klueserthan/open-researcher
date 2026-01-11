@@ -64,7 +64,10 @@ build-backend = "setuptools.build_meta"
 [dependency-groups]
 dev = [
     "pre-commit>=4.1.0",
+    "pytest>=9.0.2",
     "pytest-asyncio>=1.2.0",
+    "pytest-cov>=7.0.0",
+    "ruff>=0.14.11",
     "types-requests>=2.32.4.20250913",
 ]
 
@@ -96,3 +99,33 @@ ignore = [
 [[tool.mypy.overrides]]
 module = "pages.*"
 ignore_errors = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "-v",                      # Verbose output
+    "--strict-markers",        # Strict marker checking
+    "--tb=short",              # Short traceback format
+    "--disable-warnings",      # Disable warnings
+    "-ra",                     # Show summary of all test outcomes
+    "--cov=open_notebook",     # Coverage for open_notebook module
+    "--cov=api",               # Coverage for api module
+    "--cov-report=term-missing", # Show missing lines in coverage report
+    "--cov-report=html",       # Generate HTML coverage report
+    "--cov-fail-under=0",      # Don't fail on low coverage (adjust as needed)
+]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests as integration tests",
+    "unit: marks tests as unit tests",
+    "asyncio: marks tests as async",
+]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+filterwarnings = [
+    "ignore::DeprecationWarning",
+    "ignore::PendingDeprecationWarning",
+]
