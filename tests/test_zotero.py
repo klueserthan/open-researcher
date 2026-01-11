@@ -171,18 +171,20 @@ class TestZoteroClientSearch:
         # Should be limited to 50 items
         assert len(results) == 50
 
-    def test_search_invalid_fields_warning(self, caplog):
+    def test_search_invalid_fields_warning(self):
         """Test warning is logged for invalid search fields."""
-        import logging
         mock_items = []
         self.client.zot.items = Mock(return_value=mock_items)
         
-        with caplog.at_level(logging.WARNING):
+        with patch('open_notebook.utils.zotero_client.logger') as mock_logger:
             self.client.search("test", search_fields=["invalid", "field", "title"])
-        
-        # Check warning was logged
-        assert "Unrecognized search_fields" in caplog.text
-        assert "invalid" in caplog.text
+            
+            # Check warning was logged
+            mock_logger.warning.assert_called_once()
+            warning_call = mock_logger.warning.call_args[0][0]
+            assert "Unrecognized search_fields" in warning_call
+            assert "invalid" in warning_call
+            assert "field" in warning_call
 
     def test_search_exception_handling(self):
         """Test search handles exceptions from pyzotero."""
