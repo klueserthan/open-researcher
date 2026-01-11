@@ -178,7 +178,7 @@ stop-all:
 	@pkill -f "surreal-commands-worker" || true
 	@pkill -f "run_api.py" || true
 	@pkill -f "uvicorn api.main:app" || true
-	@docker compose down
+	@docker compose down 2>/dev/null || true
 	@echo "✅ All services stopped!"
 
 status:
