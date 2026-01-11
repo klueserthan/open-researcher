@@ -34,7 +34,7 @@ from open_notebook.database.repository import ensure_record_id, repo_query
 from open_notebook.domain.notebook import Notebook, Source
 from open_notebook.domain.transformation import Transformation
 from open_notebook.exceptions import InvalidInputError
-from open_notebook.utils.zotero_client import ZoteroClient, get_zotero_client
+from open_notebook.utils.zotero_client import get_zotero_client
 
 router = APIRouter()
 
@@ -406,7 +406,7 @@ async def create_source(
             except ValueError as e:
                 raise HTTPException(
                     status_code=400,
-                    detail=f"Zotero not configured: {str(e)}",
+                    detail=f"Zotero not configured: {str(e)}. Please set ZOTERO_API_KEY and ZOTERO_USER_ID or ZOTERO_GROUP_ID environment variables.",
                 )
             except Exception as e:
                 logger.error(f"Failed to fetch Zotero item: {e}")
@@ -1110,23 +1110,53 @@ async def search_zotero(request: ZoteroSearchRequest):
                 status_code=500, detail=f"Zotero search failed: {str(e)}"
             )
 
-        # Format results
+        # Format results without triggering extra per-item attachment fetches
         results = []
         for item in items:
-            formatted = zotero_client.format_item_for_source(item)
-            metadata = formatted.get("metadata", {})
+            data = item.get("data", {}) or {}
+
+            # Extract basic fields directly from search result
+            zotero_key = item.get("key", "")
+            title = data.get("title", "")
+
+            # Extract authors from creators
+            creators = data.get("creators", []) or []
+            authors = []
+            for creator in creators:
+                if not isinstance(creator, dict):
+                    continue
+                first_name = creator.get("firstName", "")
+                last_name = creator.get("lastName", "")
+                name = creator.get("name", "")  # For organizations
+                
+                if name:
+                    authors.append(name)
+                elif first_name or last_name:
+                    authors.append(f"{first_name} {last_name}".strip())
+
+            # Extract year from date field
+            date_str = data.get("date", "")
+            year = ""
+            if date_str and len(date_str) >= 4:
+                year = date_str[:4] if date_str[:4].isdigit() else ""
+
+            item_type = data.get("itemType", "")
+            publication = data.get("publicationTitle", "")
+            abstract = data.get("abstractNote", "")
+            url = data.get("url")
 
             results.append(
                 ZoteroItemResponse(
-                    key=formatted.get("zotero_key", ""),
-                    title=formatted.get("title", ""),
-                    authors=metadata.get("authors", []),
-                    year=metadata.get("year", ""),
-                    item_type=metadata.get("item_type", ""),
-                    publication=metadata.get("publication", ""),
-                    abstract=item.get("data", {}).get("abstractNote", ""),
-                    url=metadata.get("url"),
-                    attachment_url=formatted.get("url"),
+                    key=zotero_key,
+                    title=title,
+                    authors=authors,
+                    year=year,
+                    item_type=item_type,
+                    publication=publication,
+                    abstract=abstract,
+                    url=url,
+                    # Omit attachment_url to avoid N+1 API calls during search
+                    attachment_url=None,
                 )
             )
 

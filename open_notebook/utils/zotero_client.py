@@ -40,10 +40,16 @@ class ZoteroClient:
             raise ValueError(
                 "Zotero API key is required. Set ZOTERO_API_KEY environment variable."
             )
+        
+        # Validate library_type
+        if self.library_type not in ("user", "group"):
+            raise ValueError(
+                f"Invalid library_type: {self.library_type}. Must be 'user' or 'group'."
+            )
 
         self.zot = zotero.Zotero(self.library_id, self.library_type, self.api_key)
-        logger.info(
-            f"Initialized Zotero client for {self.library_type} library: {self.library_id}"
+        logger.debug(
+            f"Initialized Zotero client for {self.library_type} library"
         )
 
     def search(
@@ -57,8 +63,9 @@ class ZoteroClient:
 
         Args:
             query: Search query text
-            search_fields: Fields to search in. Options: ['title', 'creator', 'year', 'tag', 'note', 'fulltext']
-                          If None, searches in title and creator by default
+            search_fields: Controls search mode. If 'fulltext' is included, performs full-text search.
+                          Otherwise, performs quick search in title, creator, and year fields.
+                          Note: Individual field filtering is not supported - only fulltext vs. quick search.
             limit: Maximum number of results to return
 
         Returns:
@@ -76,17 +83,18 @@ class ZoteroClient:
         )
 
         try:
-            results = []
-            
             # Zotero search uses different methods based on field
             if "fulltext" in search_fields:
                 # Full-text search
                 logger.debug("Performing full-text search")
                 results = self.zot.everything(self.zot.fulltext_item(query))
+                # Apply limit to fulltext results
+                results = results[:limit]
             else:
-                # Quick search in title, creator, etc.
-                # The 'q' parameter searches in title, creator, and year
-                logger.debug("Performing quick search")
+                # Quick search in title, creator, and year
+                # Note: The 'q' parameter searches in title, creator, and year fields
+                # The search_fields parameter only controls whether fulltext search is used
+                logger.debug("Performing quick search in title, creator, and year")
                 results = self.zot.items(q=query, limit=limit)
 
             logger.info(f"Found {len(results)} items in Zotero library")
@@ -106,6 +114,10 @@ class ZoteroClient:
         Returns:
             Zotero item data
         """
+        if not item_key or not item_key.strip():
+            raise ValueError("Zotero item_key cannot be empty")
+        
+        item_key = item_key.strip()
         logger.info(f"Fetching Zotero item: {item_key}")
         try:
             item = self.zot.item(item_key)

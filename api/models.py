@@ -326,8 +326,11 @@ class SourceCreate(BaseModel):
     @model_validator(mode="after")
     def validate_source_type_fields(self):
         # Validate that zotero_item_key is provided for zotero type
-        if self.type == "zotero" and not self.zotero_item_key:
-            raise ValueError("zotero_item_key is required for zotero type")
+        if self.type == "zotero":
+            if not self.zotero_item_key or not self.zotero_item_key.strip():
+                raise ValueError("zotero_item_key is required for zotero type")
+            # Normalize to trimmed value
+            self.zotero_item_key = self.zotero_item_key.strip()
         
         return self
 
@@ -339,6 +342,12 @@ class ZoteroSearchRequest(BaseModel):
         description="Fields to search in: title, creator, year, tag, note, fulltext. Default: title and creator",
     )
     limit: int = Field(100, ge=1, le=500, description="Maximum number of results")
+    
+    @model_validator(mode="after")
+    def validate_query(self):
+        if not self.query or not self.query.strip():
+            raise ValueError("Search query cannot be empty")
+        return self
 
 
 class ZoteroItemResponse(BaseModel):

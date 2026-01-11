@@ -181,10 +181,13 @@ export function SourceTypeStep({ control, register, errors, urlValidationErrors,
               value={field.value || ''} 
               onValueChange={(value) => {
                 field.onChange(value as 'link' | 'upload' | 'text' | 'zotero')
-                // Reset Zotero state when switching away
+                // Reset Zotero state and clear form field when switching away
                 if (value !== 'zotero') {
                   setZoteroResults([])
                   setSelectedZoteroItem(null)
+                  if (setValue) {
+                    setValue('zotero_item_key', '')
+                  }
                 }
               }}
               className="w-full"

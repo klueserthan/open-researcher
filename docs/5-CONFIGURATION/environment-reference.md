@@ -238,7 +238,7 @@ For self-hosted LLMs, LM Studio, or OpenAI-compatible endpoints:
 3. Find your user ID in your Zotero profile URL (e.g., https://www.zotero.org/users/12345 → user ID is 12345)
 4. For group libraries, use the group ID from the group's URL
 
-**Note:** You can use either a personal library (ZOTERO_USER_ID) or a group library (ZOTERO_GROUP_ID), but not both.
+**Note:** You can configure either a personal library (ZOTERO_USER_ID) or a group library (ZOTERO_GROUP_ID). If both are set, the personal library (ZOTERO_USER_ID) takes precedence.
 
 ---
 
