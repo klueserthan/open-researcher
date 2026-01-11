@@ -129,3 +129,12 @@ filterwarnings = [
     "ignore::DeprecationWarning",
     "ignore::PendingDeprecationWarning",
 ]
+
+[tool.bandit]
+exclude_dirs = ["tests", ".venv"]
+skips = [
+    "B101",  # Skip assert_used check (common in tests)
+    "B110",  # Skip try_except_pass (intentional cleanup handlers)
+    "B112",  # Skip try_except_continue (intentional error handling)
+    "B608",  # Skip hardcoded_sql_expressions (SurrealDB uses safe parameterization)
+]
