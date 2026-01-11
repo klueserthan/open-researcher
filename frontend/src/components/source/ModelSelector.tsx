@@ -29,10 +29,10 @@ interface ModelSelectorProps {
   disabled?: boolean
 }
 
-export function ModelSelector({ 
-  currentModel, 
+export function ModelSelector({
+  currentModel,
   onModelChange,
-  disabled = false 
+  disabled = false
 }: ModelSelectorProps) {
   const [open, setOpen] = useState(false)
   const [selectedModel, setSelectedModel] = useState(currentModel || 'default')
@@ -82,8 +82,8 @@ export function ModelSelector({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button 
-          variant="outline" 
+        <Button
+          variant="outline"
           size="sm"
           disabled={disabled}
           className="gap-2"

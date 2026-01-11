@@ -21,7 +21,7 @@ How Open Notebook makes AI aware of your research - two different approaches.
 ### 3. [Chat vs. Transformations](chat-vs-transformations.md)
 Why Open Notebook has different interaction modes and when to use each one.
 
-**Key idea**: Chat is conversational exploration (you control context). Transformations are insight extractions. They reduced content to smaller bits of concentrated/dense information, which is much more suitable for an AI to use. 
+**Key idea**: Chat is conversational exploration (you control context). Transformations are insight extractions. They reduced content to smaller bits of concentrated/dense information, which is much more suitable for an AI to use.
 
 ---
 
@@ -67,4 +67,3 @@ These core concepts explain how that works.
 1. **Just want to use it?** → Go to [User Guide](../3-USER-GUIDE/index.md)
 2. **Want to understand it first?** → Read the 5 sections above (15 min)
 3. **Setting up for the first time?** → Go to [Installation](../1-INSTALLATION/index.md)
-

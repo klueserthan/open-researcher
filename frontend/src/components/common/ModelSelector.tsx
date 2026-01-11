@@ -14,16 +14,16 @@ interface ModelSelectorProps {
   disabled?: boolean
 }
 
-export function ModelSelector({ 
-  label, 
-  modelType, 
-  value, 
-  onChange, 
+export function ModelSelector({
+  label,
+  modelType,
+  value,
+  onChange,
   placeholder = 'Select a model',
-  disabled = false 
+  disabled = false
 }: ModelSelectorProps) {
   const { data: models, isLoading } = useModels()
-  
+
   // Filter models by type
   const filteredModels = models?.filter(model => model.type === modelType) || []
   return (

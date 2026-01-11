@@ -331,7 +331,7 @@ class SourceCreate(BaseModel):
                 raise ValueError("zotero_item_key is required for zotero type")
             # Normalize to trimmed value
             self.zotero_item_key = self.zotero_item_key.strip()
-        
+
         return self
 
 
@@ -342,7 +342,7 @@ class ZoteroSearchRequest(BaseModel):
         description="Fields to search in: title, creator, fulltext. Default: title and creator",
     )
     limit: int = Field(100, ge=1, le=500, description="Maximum number of results")
-    
+
     @model_validator(mode="after")
     def validate_query(self):
         if not self.query or not self.query.strip():
@@ -352,6 +352,7 @@ class ZoteroSearchRequest(BaseModel):
 
 class ZoteroAuthor(BaseModel):
     """Author information from Zotero."""
+
     name: str = Field(..., description="Author full name")
     first_name: str = Field(default="", description="Author first name")
     last_name: str = Field(default="", description="Author last name")
@@ -360,7 +361,9 @@ class ZoteroAuthor(BaseModel):
 class ZoteroItemResponse(BaseModel):
     key: str = Field(..., description="Zotero item key")
     title: str = Field(..., description="Item title")
-    authors: List[ZoteroAuthor] = Field(default_factory=list, description="List of authors")
+    authors: List[ZoteroAuthor] = Field(
+        default_factory=list, description="List of authors"
+    )
     year: str = Field(default="", description="Publication year")
     item_type: str = Field(default="", description="Item type (article, book, etc.)")
     publication: str = Field(default="", description="Publication name")
@@ -370,7 +373,9 @@ class ZoteroItemResponse(BaseModel):
     doi: str = Field(default="", description="DOI identifier")
     isbn: str = Field(default="", description="ISBN identifier")
     url: Optional[str] = Field(None, description="Item URL")
-    attachment_url: Optional[str] = Field(None, description="Attachment URL if available")
+    attachment_url: Optional[str] = Field(
+        None, description="Attachment URL if available"
+    )
 
 
 class SourceUpdate(BaseModel):

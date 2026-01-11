@@ -91,7 +91,7 @@ export function SourcesColumn({
     container.addEventListener('scroll', handleScroll)
     return () => container.removeEventListener('scroll', handleScroll)
   }, [handleScroll])
-  
+
   const handleDeleteClick = (sourceId: string) => {
     setSourceToDelete(sourceId)
     setDeleteDialogOpen(true)

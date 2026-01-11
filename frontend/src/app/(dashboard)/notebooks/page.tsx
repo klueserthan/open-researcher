@@ -69,19 +69,19 @@ export default function NotebooksPage() {
             </Button>
           </div>
         </div>
-        
+
         <div className="space-y-8">
-          <NotebookList 
-            notebooks={filteredActive} 
+          <NotebookList
+            notebooks={filteredActive}
             isLoading={isLoading}
             title="Active Notebooks"
             emptyTitle={isSearching ? 'No notebooks match your search' : undefined}
             emptyDescription={isSearching ? 'Try using a different notebook name.' : undefined}
           />
-          
+
           {hasArchived && (
-            <NotebookList 
-              notebooks={filteredArchived} 
+            <NotebookList
+              notebooks={filteredArchived}
               isLoading={false}
               title="Archived Notebooks"
               collapsible

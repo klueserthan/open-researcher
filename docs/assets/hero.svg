@@ -26,15 +26,15 @@
     <!-- Central Node -->
     <circle cx="120" cy="80" r="20" fill="url(#nodeGradient)"/>
     <circle cx="120" cy="80" r="24" stroke="url(#nodeGradient)" stroke-width="1" fill="none"/>
-    
+
     <!-- Left Node -->
     <circle cx="80" cy="120" r="16" fill="url(#nodeGradient)"/>
     <circle cx="80" cy="120" r="20" stroke="url(#nodeGradient)" stroke-width="1" fill="none"/>
-    
+
     <!-- Right Node -->
     <circle cx="160" cy="120" r="16" fill="url(#nodeGradient)"/>
     <circle cx="160" cy="120" r="20" stroke="url(#nodeGradient)" stroke-width="1" fill="none"/>
-    
+
     <!-- Bottom Node -->
     <circle cx="120" cy="160" r="18" fill="url(#nodeGradient)"/>
     <circle cx="120" cy="160" r="22" stroke="url(#nodeGradient)" stroke-width="1" fill="none"/>

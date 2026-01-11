@@ -2,7 +2,7 @@
 -- Rollback Migration 8: Revert to notebook-only chat sessions
 
 DEFINE TABLE OVERWRITE refers_to
-TYPE RELATION 
+TYPE RELATION
 FROM chat_session TO notebook;
 
 -- Remove model_override field from chat_session

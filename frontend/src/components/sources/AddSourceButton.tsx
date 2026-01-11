@@ -13,8 +13,8 @@ interface AddSourceButtonProps {
   iconOnly?: boolean
 }
 
-export function AddSourceButton({ 
-  defaultNotebookId, 
+export function AddSourceButton({
+  defaultNotebookId,
   variant = 'default',
   size = 'default',
   className,

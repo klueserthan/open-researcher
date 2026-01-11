@@ -52,7 +52,7 @@ export function useSourceChat(sourceId: string) {
 
   // Create session mutation
   const createSessionMutation = useMutation({
-    mutationFn: (data: Omit<CreateSourceChatSessionRequest, 'source_id'>) => 
+    mutationFn: (data: Omit<CreateSourceChatSessionRequest, 'source_id'>) =>
       sourceChatApi.createSession(sourceId, data),
     onSuccess: (newSession) => {
       queryClient.invalidateQueries({ queryKey: ['sourceChatSessions', sourceId] })
@@ -80,7 +80,7 @@ export function useSourceChat(sourceId: string) {
 
   // Delete session mutation
   const deleteSessionMutation = useMutation({
-    mutationFn: (sessionId: string) => 
+    mutationFn: (sessionId: string) =>
       sourceChatApi.deleteSession(sourceId, sessionId),
     onSuccess: (_, deletedId) => {
       queryClient.invalidateQueries({ queryKey: ['sourceChatSessions', sourceId] })
@@ -149,7 +149,7 @@ export function useSourceChat(sourceId: string) {
           if (line.startsWith('data: ')) {
             try {
               const data = JSON.parse(line.slice(6))
-              
+
               if (data.type === 'ai_message') {
                 // Create AI message on first content chunk to avoid empty bubble
                 if (!aiMessage) {
@@ -230,7 +230,7 @@ export function useSourceChat(sourceId: string) {
     isStreaming,
     contextIndicators,
     loadingSessions,
-    
+
     // Actions
     createSession,
     updateSession,

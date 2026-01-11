@@ -1,9 +1,9 @@
 # Open Notebook - Advanced Docker Setup Guide
 
 > **This documentation has moved!**
-> 
+>
 > This content is now available at [deployment/docker.md](../docs/deployment/docker.md)
-> 
+>
 > Please update your bookmarks and links to point to the new location.
 
 ---

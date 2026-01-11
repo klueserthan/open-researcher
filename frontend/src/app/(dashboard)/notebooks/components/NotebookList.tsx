@@ -17,10 +17,10 @@ interface NotebookListProps {
   emptyDescription?: string
 }
 
-export function NotebookList({ 
-  notebooks, 
-  isLoading, 
-  title, 
+export function NotebookList({
+  notebooks,
+  isLoading,
+  title,
   collapsible = false,
   emptyTitle,
   emptyDescription,

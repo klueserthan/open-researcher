@@ -16,13 +16,13 @@ interface NotebookHeaderProps {
 
 export function NotebookHeader({ notebook }: NotebookHeaderProps) {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
-  
+
   const updateNotebook = useUpdateNotebook()
   const deleteNotebook = useDeleteNotebook()
 
   const handleUpdateName = async (name: string) => {
     if (!name || name === notebook.name) return
-    
+
     await updateNotebook.mutateAsync({
       id: notebook.id,
       data: { name }
@@ -31,7 +31,7 @@ export function NotebookHeader({ notebook }: NotebookHeaderProps) {
 
   const handleUpdateDescription = async (description: string) => {
     if (description === notebook.description) return
-    
+
     await updateNotebook.mutateAsync({
       id: notebook.id,
       data: { description: description || undefined }
@@ -96,7 +96,7 @@ export function NotebookHeader({ notebook }: NotebookHeaderProps) {
               </Button>
             </div>
           </div>
-          
+
           <InlineEdit
             value={notebook.description || ''}
             onSave={handleUpdateDescription}
@@ -106,9 +106,9 @@ export function NotebookHeader({ notebook }: NotebookHeaderProps) {
             multiline
             emptyText="Add a description..."
           />
-          
+
           <div className="text-sm text-muted-foreground">
-            Created {formatDistanceToNow(new Date(notebook.created), { addSuffix: true })} • 
+            Created {formatDistanceToNow(new Date(notebook.created), { addSuffix: true })} •
             Updated {formatDistanceToNow(new Date(notebook.updated), { addSuffix: true })}
           </div>
         </div>

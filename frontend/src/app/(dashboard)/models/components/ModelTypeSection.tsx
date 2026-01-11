@@ -64,16 +64,16 @@ export function ModelTypeSection({ type, models, providers, isLoading }: ModelTy
   }
 
   const { title, description, icon: Icon, iconColor, bgColor } = getTypeInfo()
-  
+
   // Filter and sort models
   const filteredModels = useMemo(() => {
     let filtered = models.filter(model => model.type === type)
-    
+
     // Apply provider filter if selected
     if (selectedProvider) {
       filtered = filtered.filter(model => model.provider === selectedProvider)
     }
-    
+
     // Sort by name alphabetically
     return filtered.sort((a, b) => a.name.localeCompare(b.name))
   }, [models, type, selectedProvider])
@@ -142,7 +142,7 @@ export function ModelTypeSection({ type, models, providers, isLoading }: ModelTy
             </div>
           ) : filteredModels.length === 0 ? (
             <div className="text-center py-6 text-sm text-muted-foreground">
-              {selectedProvider 
+              {selectedProvider
                 ? `No ${selectedProvider} models configured`
                 : 'No models configured'
               }

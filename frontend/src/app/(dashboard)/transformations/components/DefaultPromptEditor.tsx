@@ -57,7 +57,7 @@ export function DefaultPromptEditor() {
               disabled={isLoading}
             />
             <div className="flex justify-end">
-              <Button 
+              <Button
                 onClick={handleSave}
                 disabled={isLoading || updateDefaultPrompt.isPending}
               >

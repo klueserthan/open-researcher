@@ -30,16 +30,17 @@ class ZoteroClient:
         """
         # Trim whitespace from parameters if provided directly
         self.library_id = (
-            library_id.strip() if library_id is not None
+            library_id.strip()
+            if library_id is not None
             else os.getenv("ZOTERO_USER_ID") or os.getenv("ZOTERO_GROUP_ID")
         )
         self.library_type = (
-            library_type.strip() if library_type is not None
+            library_type.strip()
+            if library_type is not None
             else os.getenv("ZOTERO_LIBRARY_TYPE", "user")
         )
         self.api_key = (
-            api_key.strip() if api_key is not None
-            else os.getenv("ZOTERO_API_KEY")
+            api_key.strip() if api_key is not None else os.getenv("ZOTERO_API_KEY")
         )
 
         if not self.library_id:
@@ -50,7 +51,7 @@ class ZoteroClient:
             raise ValueError(
                 "Zotero API key is required. Set ZOTERO_API_KEY environment variable."
             )
-        
+
         # Validate library_type
         if self.library_type not in ("user", "group"):
             raise ValueError(
@@ -58,9 +59,7 @@ class ZoteroClient:
             )
 
         self.zot = zotero.Zotero(self.library_id, self.library_type, self.api_key)
-        logger.debug(
-            f"Initialized Zotero client for {self.library_type} library"
-        )
+        logger.debug(f"Initialized Zotero client for {self.library_type} library")
 
     def search(
         self,
@@ -87,7 +86,7 @@ class ZoteroClient:
         # Default to searching title and creator
         if search_fields is None:
             search_fields = ["title", "creator"]
-        
+
         # Validate search_fields contents: only known values are meaningful
         valid_fields = {"fulltext", "title", "creator"}
         invalid_fields = [field for field in search_fields if field not in valid_fields]
@@ -135,7 +134,7 @@ class ZoteroClient:
         """
         if not item_key or not item_key.strip():
             raise ValueError("Zotero item_key cannot be empty")
-        
+
         item_key = item_key.strip()
         logger.info(f"Fetching Zotero item: {item_key}")
         try:
@@ -169,10 +168,18 @@ class ZoteroClient:
                 child_data = child.get("data", {})
                 if child_data.get("itemType") == "attachment":
                     content_type = child_data.get("contentType", "")
-                    if "pdf" in content_type.lower() or "document" in content_type.lower():
+                    if (
+                        "pdf" in content_type.lower()
+                        or "document" in content_type.lower()
+                    ):
                         # Check if it's a link or file attachment
                         link_mode = child_data.get("linkMode")
-                        if link_mode in ["linked_url", "imported_url", "linked_file", "imported_file"]:
+                        if link_mode in [
+                            "linked_url",
+                            "imported_url",
+                            "linked_file",
+                            "imported_file",
+                        ]:
                             url = child_data.get("url")
                             if url:
                                 logger.debug(f"Found attachment URL: {url}")
@@ -184,14 +191,16 @@ class ZoteroClient:
         except Exception as e:
             logger.warning(f"Error getting attachment URL: {e}")
             return None
-    
-    def extract_authors_from_creators(self, creators: List[Dict[str, Any]]) -> List[Dict[str, str]]:
+
+    def extract_authors_from_creators(
+        self, creators: List[Dict[str, Any]]
+    ) -> List[Dict[str, str]]:
         """
         Extract a list of author dictionaries from Zotero creators.
-        
+
         Args:
             creators: List of creator dictionaries from Zotero item
-            
+
         Returns:
             List of author dictionaries with 'name', 'first_name', and 'last_name' keys
         """
@@ -202,27 +211,25 @@ class ZoteroClient:
             first_name = creator.get("firstName", "") or ""
             last_name = creator.get("lastName", "") or ""
             name = creator.get("name", "") or ""  # For organizations
-            
+
             # Strip whitespace
             first_name = first_name.strip()
             last_name = last_name.strip()
             name = name.strip()
-            
+
             if name:
                 # Organization name
-                authors.append({
-                    "name": name,
-                    "first_name": "",
-                    "last_name": ""
-                })
+                authors.append({"name": name, "first_name": "", "last_name": ""})
             elif first_name or last_name:
                 # Individual author
                 full_name = f"{first_name} {last_name}".strip()
-                authors.append({
-                    "name": full_name,
-                    "first_name": first_name,
-                    "last_name": last_name
-                })
+                authors.append(
+                    {
+                        "name": full_name,
+                        "first_name": first_name,
+                        "last_name": last_name,
+                    }
+                )
         return authors
 
     def format_item_for_source(self, item: Dict[str, Any]) -> Dict[str, Any]:
@@ -264,14 +271,14 @@ class ZoteroClient:
 
         # Build content text from metadata (without abstract)
         content_parts = [f"# {title}\n"]
-        
+
         if authors:
             author_names = [author["name"] for author in authors]
             content_parts.append(f"**Authors:** {', '.join(author_names)}\n")
-        
+
         if metadata["year"]:
             content_parts.append(f"**Year:** {metadata['year']}\n")
-        
+
         if metadata["publication"]:
             pub_info = metadata["publication"]
             if metadata["volume"]:
@@ -279,13 +286,13 @@ class ZoteroClient:
             if metadata["issue"]:
                 pub_info += f", Issue {metadata['issue']}"
             content_parts.append(f"**Publication:** {pub_info}\n")
-        
+
         if metadata["doi"]:
             content_parts.append(f"**DOI:** {metadata['doi']}\n")
-        
+
         if metadata["isbn"]:
             content_parts.append(f"**ISBN:** {metadata['isbn']}\n")
-        
+
         if metadata["url"]:
             content_parts.append(f"**URL:** {metadata['url']}\n")
 

@@ -63,7 +63,7 @@ export function EpisodeProfilesPanel({
 
   const sortedProfiles = useMemo(
     () =>
-      [...episodeProfiles].sort((a, b) => a.name.localeCompare(b.name, 'en')), 
+      [...episodeProfiles].sort((a, b) => a.name.localeCompare(b.name, 'en')),
     [episodeProfiles]
   )
 

@@ -114,63 +114,63 @@
   * {
     @apply border-border outline-ring/50;
   }
-  
+
   html {
     @apply antialiased;
   }
-  
+
   body {
     @apply bg-background text-foreground transition-colors;
   }
-  
+
   /* Ensure proper theme inheritance for popovers and dropdowns */
   .dark {
     color-scheme: dark;
   }
-  
+
   :root {
     color-scheme: light;
   }
-  
+
   /* Ensure Radix UI components inherit theme properly */
   [data-radix-popper-content-wrapper] {
     @apply z-50;
   }
-  
+
   /* Force theme inheritance for portaled content */
   .dark [data-radix-popper-content-wrapper],
   .dark [data-overlay-container] {
     color-scheme: dark;
   }
-  
+
   /* Ensure sidebar gets proper theme */
   .app-sidebar {
     background-color: var(--sidebar);
     color: var(--sidebar-foreground);
     border-color: var(--sidebar-border);
   }
-  
+
   /* Enhanced hover effects for cards */
   .card-hover {
     @apply transition-all duration-200 cursor-pointer;
   }
-  
+
   .card-hover:hover {
     background-color: var(--muted) !important;
     border-color: var(--border);
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   }
-  
+
   .dark .card-hover:hover {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   }
-  
+
   /* Ensure clickable cards show pointer cursor */
   .clickable-card {
     cursor: pointer !important;
   }
-  
+
   .clickable-card * {
     cursor: pointer !important;
   }

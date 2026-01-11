@@ -50,7 +50,7 @@ DEFINE INDEX IF NOT EXISTS idx_episode_command ON TABLE episode COLUMNS command 
 
 --Sample data
 
-insert into episode_profile 
+insert into episode_profile
 [
             {
                 name: "tech_discussion",
@@ -58,7 +58,7 @@ insert into episode_profile
                 speaker_config: "tech_experts",
                 outline_provider: "openai",
                 outline_model: "gpt-5-mini",
-                transcript_provider: "openai", 
+                transcript_provider: "openai",
                 transcript_model: "gpt-5-mini",
                 default_briefing: "Create an engaging technical discussion about the provided content. Focus on practical insights, real-world applications, and detailed explanations that would interest developers and technical professionals.",
                 num_segments: 5
@@ -70,7 +70,7 @@ insert into episode_profile
                 outline_provider: "openai",
                 outline_model: "gpt-5-mini",
                 transcript_provider: "openai",
-                transcript_model: "gpt-5-mini", 
+                transcript_model: "gpt-5-mini",
                 default_briefing: "Create an educational explanation of the provided content. Break down complex concepts into digestible segments, use analogies and examples, and maintain an engaging teaching style.",
                 "num_segments":4            },
             {
@@ -101,7 +101,7 @@ insert into speaker_profile
                     },
                     {
                         name: "Jamie Rodriguez",
-                        voice_id: "alloy", 
+                        voice_id: "alloy",
                         backstory: "Full-stack engineer and tech entrepreneur. Loves practical applications and real-world implementations.",
                         personality: "Enthusiastic, practical-minded, great at explaining implementation details and trade-offs"
                     }
@@ -124,7 +124,7 @@ insert into speaker_profile
             {
                 name: "business_panel",
                 description: "Business analysis panel with diverse perspectives",
-                tts_provider: "openai", 
+                tts_provider: "openai",
                 tts_model: "gpt-4o-mini-tts",
                 speakers: [
                     {
@@ -134,13 +134,13 @@ insert into speaker_profile
                         personality: "Strategic thinker, data-driven, excellent at identifying key insights and implications"
                     },
                     {
-                        name: "Elena Vasquez", 
+                        name: "Elena Vasquez",
                         voice_id: "shimmer",
                         backstory: "Serial entrepreneur and investor. Focuses on practical implementation and execution.",
                         personality: "Action-oriented, pragmatic, brings startup experience and execution focus"
                     },
                     {
-                        name: "Johny Bing", 
+                        name: "Johny Bing",
                         voice_id: "ash",
                         backstory: "Youtube celebrity and business mogul. Focuses on practical implementation and execution.",
                         personality: "Controversial, likes to question ideas and concepts. He brings a fresh perspective and always has a point to make."
@@ -148,5 +148,3 @@ insert into speaker_profile
                 ]
             }
         ];
-
-

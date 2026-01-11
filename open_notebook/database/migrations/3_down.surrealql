@@ -7,22 +7,22 @@ REMOVE FUNCTION fn::vector_search;
 
 
 DEFINE FUNCTION IF NOT EXISTS fn::vector_search($query: array<float>, $match_count: int, $sources:bool, $show_notes:bool) {
-   
-    let $source_embedding_search = 
+
+    let $source_embedding_search =
          IF $sources {(
             SELECT source as item_id, content, vector::similarity::cosine(embedding, $query) as similarity
             FROM source_embedding LIMIT $match_count)}
         ELSE { [] };
 
-    
-    let $source_insight_search = 
+
+    let $source_insight_search =
          IF $sources {(
              SELECT source as item_id, content, vector::similarity::cosine(embedding, $query) as similarity
                 FROM source_insight LIMIT $match_count)}
         ELSE { [] };
 
-    
-     let $note_content_search = 
+
+     let $note_content_search =
          IF $show_notes {(
                 SELECT id as item_id, content, vector::similarity::cosine(embedding, $query) as similarity
                 FROM note LIMIT $match_count)}
@@ -30,7 +30,7 @@ DEFINE FUNCTION IF NOT EXISTS fn::vector_search($query: array<float>, $match_cou
         ELSE { [] };
 
     let $source_chunk_results = array::union($source_embedding_search, $source_insight_search);
-    
+
     let $source_results = array::union($source_chunk_results, $source_insight_search);
 
     let $note_results = $note_content_search;
@@ -38,24 +38,24 @@ DEFINE FUNCTION IF NOT EXISTS fn::vector_search($query: array<float>, $match_cou
 
     RETURN (SELECT item_id, math::max(similarity) as similarity from $final_results
         group by item_id ORDER BY similarity DESC LIMIT $match_count);
-    
-    
+
+
 };
 
 REMOVE FUNCTION fn::text_search;
 
 
 DEFINE FUNCTION IF NOT EXISTS fn::text_search($query_text: string, $match_count: int, $sources:bool, $show_notes:bool) {
-  
-    let $source_title_search = 
+
+    let $source_title_search =
         IF $sources {(
             SELECT id as item_id, math::max(search::score(1)) AS relevance
             FROM source
             WHERE title @1@ $query_text
             GROUP BY item_id)}
         ELSE { [] };
-    
-    let $source_embedding_search = 
+
+    let $source_embedding_search =
          IF $sources {(
              SELECT source as item_id, math::max(search::score(1)) AS relevance
             FROM source_embedding
@@ -63,15 +63,15 @@ DEFINE FUNCTION IF NOT EXISTS fn::text_search($query_text: string, $match_count:
             GROUP BY item_id)}
         ELSE { [] };
 
-    let $source_full_search = 
+    let $source_full_search =
          IF $sources {(
             SELECT source as item_id, math::max(search::score(1)) AS relevance
             FROM source
             WHERE full_text @1@ $query_text
             GROUP BY item_id)}
         ELSE { [] };
-    
-    let $source_insight_search = 
+
+    let $source_insight_search =
          IF $sources {(
              SELECT source as item_id, math::max(search::score(1)) AS relevance
             FROM source_insight
@@ -79,7 +79,7 @@ DEFINE FUNCTION IF NOT EXISTS fn::text_search($query_text: string, $match_count:
             GROUP BY item_id)}
         ELSE { [] };
 
-    let $note_title_search = 
+    let $note_title_search =
          IF $show_notes {(
              SELECT id as item_id, math::max(search::score(1)) AS relevance
             FROM note
@@ -87,7 +87,7 @@ DEFINE FUNCTION IF NOT EXISTS fn::text_search($query_text: string, $match_count:
             GROUP BY item_id)}
         ELSE { [] };
 
-     let $note_content_search = 
+     let $note_content_search =
          IF $show_notes {(
              SELECT id as item_id, math::max(search::score(1)) AS relevance
             FROM note
@@ -96,7 +96,7 @@ DEFINE FUNCTION IF NOT EXISTS fn::text_search($query_text: string, $match_count:
         ELSE { [] };
 
     let $source_chunk_results = array::union($source_embedding_search, $source_full_search);
-    
+
     let $source_asset_results = array::union($source_title_search, $source_insight_search);
 
     let $source_results = array::union($source_chunk_results, $source_asset_results );
@@ -105,6 +105,6 @@ DEFINE FUNCTION IF NOT EXISTS fn::text_search($query_text: string, $match_count:
 
     RETURN (SELECT item_id, math::max(relevance) as relevance from $final_results
         group by item_id ORDER BY relevance DESC LIMIT $match_count);
-    
-    
+
+
 };

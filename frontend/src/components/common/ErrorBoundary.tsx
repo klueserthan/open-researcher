@@ -69,16 +69,16 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
                   </pre>
                 </details>
               )}
-              <Button 
-                onClick={this.resetError} 
+              <Button
+                onClick={this.resetError}
                 className="w-full"
                 variant="outline"
               >
                 <RefreshCw className="w-4 h-4 mr-2" />
                 Try Again
               </Button>
-              <Button 
-                onClick={() => window.location.reload()} 
+              <Button
+                onClick={() => window.location.reload()}
                 className="w-full"
               >
                 Refresh Page

@@ -195,8 +195,8 @@ export function useFileUpload() {
     mutationFn: ({ file, notebookId }: { file: File; notebookId: string }) =>
       sourcesApi.upload(file, notebookId),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ 
-        queryKey: QUERY_KEYS.sources(variables.notebookId) 
+      queryClient.invalidateQueries({
+        queryKey: QUERY_KEYS.sources(variables.notebookId)
       })
       toast({
         title: 'Success',

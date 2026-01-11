@@ -152,7 +152,7 @@ export function SourceTypeStep({ control, register, errors, urlValidationErrors,
         limit: 20
       })
       setZoteroResults(results)
-      
+
       if (results.length === 0) {
         toast.info('No results found')
       }
@@ -176,8 +176,8 @@ export function SourceTypeStep({ control, register, errors, urlValidationErrors,
           control={control}
           name="type"
           render={({ field }) => (
-            <Tabs 
-              value={field.value || ''} 
+            <Tabs
+              value={field.value || ''}
               onValueChange={(value) => {
                 field.onChange(value as 'link' | 'upload' | 'text' | 'zotero')
                 // Handle state cleanup when switching source types
@@ -212,11 +212,11 @@ export function SourceTypeStep({ control, register, errors, urlValidationErrors,
                   )
                 })}
               </TabsList>
-              
+
               {SOURCE_TYPES.map((type) => (
                 <TabsContent key={type.value} value={type.value} className="mt-4">
                   <p className="text-sm text-muted-foreground mb-4">{type.description}</p>
-                  
+
                   {/* Type-specific fields */}
                   {type.value === 'link' && (
                     <div>
@@ -266,7 +266,7 @@ export function SourceTypeStep({ control, register, errors, urlValidationErrors,
                       )}
                     </div>
                   )}
-                  
+
                   {type.value === 'upload' && (
                     <div>
                       <div className="flex items-center justify-between mb-2">
@@ -314,7 +314,7 @@ export function SourceTypeStep({ control, register, errors, urlValidationErrors,
                       )}
                     </div>
                   )}
-                  
+
                   {type.value === 'text' && (
                     <div>
                       <Label htmlFor="content" className="mb-2 block">Text Content *</Label>
@@ -329,7 +329,7 @@ export function SourceTypeStep({ control, register, errors, urlValidationErrors,
                       )}
                     </div>
                   )}
-                  
+
                   {type.value === 'zotero' && (
                     <div className="space-y-4">
                       {/* Zotero Search */}
@@ -349,8 +349,8 @@ export function SourceTypeStep({ control, register, errors, urlValidationErrors,
                             placeholder="Search by title, author, or metadata..."
                             disabled={zoteroSearching}
                           />
-                          <Button 
-                            type="button" 
+                          <Button
+                            type="button"
                             onClick={handleZoteroSearch}
                             disabled={zoteroSearching || !zoteroSearchQuery.trim()}
                           >
@@ -419,7 +419,7 @@ export function SourceTypeStep({ control, register, errors, urlValidationErrors,
                         type="hidden"
                         {...register('zotero_item_key')}
                       />
-                      
+
                       {errors.zotero_item_key && (
                         <p className="text-sm text-destructive">{errors.zotero_item_key.message}</p>
                       )}

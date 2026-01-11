@@ -28,8 +28,8 @@ export function SettingsForm() {
   const updateSettings = useUpdateSettings()
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({})
   const [hasResetForm, setHasResetForm] = useState(false)
-  
-  
+
+
   const {
     control,
     handleSubmit,
@@ -131,7 +131,7 @@ export function SettingsForm() {
               </CollapsibleContent>
             </Collapsible>
           </div>
-          
+
           <div className="space-y-3">
             <Label htmlFor="url_engine">URL Processing Engine</Label>
             <Controller
@@ -266,8 +266,8 @@ export function SettingsForm() {
       </Card>
 
       <div className="flex justify-end">
-        <Button 
-          type="submit" 
+        <Button
+          type="submit"
           disabled={!isDirty || updateSettings.isPending}
         >
           {updateSettings.isPending ? 'Saving...' : 'Save Settings'}

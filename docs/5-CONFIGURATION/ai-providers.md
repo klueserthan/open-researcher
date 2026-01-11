@@ -447,7 +447,7 @@ EMBEDDING_PROVIDER=openai  # or custom
 
 ## Choosing Your Provider
 
-**1. Don't want to run locally and don't want to mess around with different providers:** 
+**1. Don't want to run locally and don't want to mess around with different providers:**
 
 Use OpenAI
 - Cloud-based

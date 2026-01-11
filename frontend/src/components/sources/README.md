@@ -5,7 +5,7 @@ The `AddSourceDialog` component provides a comprehensive interface for adding ne
 ## Features
 
 - **Multi-type source support**: Links, file uploads, and text content
-- **Multi-notebook selection**: Add sources to multiple notebooks simultaneously  
+- **Multi-notebook selection**: Add sources to multiple notebooks simultaneously
 - **Transformations**: Apply transformations during source processing
 - **Async processing**: Background processing with status monitoring
 - **Form validation**: Comprehensive validation with Zod and React Hook Form
@@ -27,7 +27,7 @@ function MyComponent() {
       <button onClick={() => setDialogOpen(true)}>
         Add Source
       </button>
-      
+
       <AddSourceDialog
         open={dialogOpen}
         onOpenChange={setDialogOpen}
@@ -54,7 +54,7 @@ import { AddSourceButton } from '@/components/sources'
 
 function MyComponent() {
   return (
-    <AddSourceButton 
+    <AddSourceButton
       defaultNotebookId="notebook:123"
       variant="outline"
       size="sm"
@@ -89,7 +89,7 @@ function MyComponent() {
 - Automatically extracts content from web pages
 - Supports most web content formats
 
-### File Upload Sources  
+### File Upload Sources
 - Supports: PDF, DOC, DOCX, TXT, MD, EPUB
 - Handles large files with async processing
 - Shows upload progress
@@ -115,7 +115,7 @@ function MyComponent() {
 The component integrates with several custom hooks:
 
 - `useNotebooks()` - Fetches available notebooks
-- `useTransformations()` - Fetches available transformations  
+- `useTransformations()` - Fetches available transformations
 - `useCreateSource()` - Handles source creation
 - `useSourceStatus()` - Monitors processing status
 

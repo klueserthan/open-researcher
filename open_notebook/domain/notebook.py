@@ -199,7 +199,9 @@ class Source(ObjectModel):
 
             # Extract execution metadata if available
             result = getattr(status_result, "result", None)
-            execution_metadata = result.get("execution_metadata", {}) if isinstance(result, dict) else {}
+            execution_metadata = (
+                result.get("execution_metadata", {}) if isinstance(result, dict) else {}
+            )
 
             return {
                 "status": status_result.status,
@@ -288,11 +290,11 @@ class Source(ObjectModel):
             # 2. Split text into chunks
             # 3. Submit each chunk as an embed_chunk job
             command_id = submit_command(
-                "open_notebook",      # app name
-                "vectorize_source",   # command name
+                "open_notebook",  # app name
+                "vectorize_source",  # command name
                 {
                     "source_id": str(self.id),
-                }
+                },
             )
 
             command_id_str = str(command_id)
@@ -304,7 +306,9 @@ class Source(ObjectModel):
             return command_id_str
 
         except Exception as e:
-            logger.error(f"Failed to submit vectorization job for source {self.id}: {e}")
+            logger.error(
+                f"Failed to submit vectorization job for source {self.id}: {e}"
+            )
             logger.exception(e)
             raise DatabaseOperationError(e)
 

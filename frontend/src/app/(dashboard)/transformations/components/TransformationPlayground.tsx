@@ -24,7 +24,7 @@ export function TransformationPlayground({ transformations, selectedTransformati
   const [inputText, setInputText] = useState('')
   const [modelId, setModelId] = useState('')
   const [output, setOutput] = useState('')
-  
+
   const executeTransformation = useExecuteTransformation()
 
   const handleExecute = async () => {
@@ -94,7 +94,7 @@ export function TransformationPlayground({ transformations, selectedTransformati
           </div>
 
           <div className="flex justify-center">
-            <Button 
+            <Button
               onClick={handleExecute}
               disabled={!canExecute}
               size="lg"

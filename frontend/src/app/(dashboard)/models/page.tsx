@@ -67,27 +67,27 @@ export default function ModelsPage() {
 
           {/* Model Types */}
           <div className="grid gap-6 lg:grid-cols-2">
-            <ModelTypeSection 
-              type="language" 
-              models={models} 
+            <ModelTypeSection
+              type="language"
+              models={models}
               providers={providers}
               isLoading={modelsLoading}
             />
-            <ModelTypeSection 
-              type="embedding" 
-              models={models} 
+            <ModelTypeSection
+              type="embedding"
+              models={models}
               providers={providers}
               isLoading={modelsLoading}
             />
-            <ModelTypeSection 
-              type="text_to_speech" 
-              models={models} 
+            <ModelTypeSection
+              type="text_to_speech"
+              models={models}
               providers={providers}
               isLoading={modelsLoading}
             />
-            <ModelTypeSection 
-              type="speech_to_text" 
-              models={models} 
+            <ModelTypeSection
+              type="speech_to_text"
+              models={models}
               providers={providers}
               isLoading={modelsLoading}
             />

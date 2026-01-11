@@ -87,11 +87,11 @@ export const useAuthStore = create<AuthState>()(
               'Content-Type': 'application/json'
             }
           })
-          
+
           if (response.ok) {
-            set({ 
-              isAuthenticated: true, 
-              token: password, 
+            set({
+              isAuthenticated: true,
+              token: password,
               isLoading: false,
               lastAuthCheck: Date.now(),
               error: null
@@ -108,8 +108,8 @@ export const useAuthStore = create<AuthState>()(
             } else {
               errorMessage = `Authentication failed (${response.status})`
             }
-            
-            set({ 
+
+            set({
               error: errorMessage,
               isLoading: false,
               isAuthenticated: false,
@@ -120,7 +120,7 @@ export const useAuthStore = create<AuthState>()(
         } catch (error) {
           console.error('Network error during auth:', error)
           let errorMessage = 'Authentication failed'
-          
+
           if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
             errorMessage = 'Unable to connect to server. Please check if the API is running.'
           } else if (error instanceof Error) {
@@ -128,8 +128,8 @@ export const useAuthStore = create<AuthState>()(
           } else {
             errorMessage = 'An unexpected error occurred during authentication'
           }
-          
-          set({ 
+
+          set({
             error: errorMessage,
             isLoading: false,
             isAuthenticated: false,
@@ -138,15 +138,15 @@ export const useAuthStore = create<AuthState>()(
           return false
         }
       },
-      
+
       logout: () => {
-        set({ 
-          isAuthenticated: false, 
-          token: null, 
-          error: null 
+        set({
+          isAuthenticated: false,
+          token: null,
+          error: null
         })
       },
-      
+
       checkAuth: async () => {
         const state = get()
         const { token, lastAuthCheck, isCheckingAuth, isAuthenticated } = state
@@ -179,12 +179,12 @@ export const useAuthStore = create<AuthState>()(
               'Content-Type': 'application/json'
             }
           })
-          
+
           if (response.ok) {
-            set({ 
-              isAuthenticated: true, 
+            set({
+              isAuthenticated: true,
               lastAuthCheck: now,
-              isCheckingAuth: false 
+              isCheckingAuth: false
             })
             return true
           } else {
@@ -198,11 +198,11 @@ export const useAuthStore = create<AuthState>()(
           }
         } catch (error) {
           console.error('checkAuth error:', error)
-          set({ 
-            isAuthenticated: false, 
+          set({
+            isAuthenticated: false,
             token: null,
             lastAuthCheck: null,
-            isCheckingAuth: false 
+            isCheckingAuth: false
           })
           return false
         }

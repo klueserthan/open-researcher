@@ -117,7 +117,7 @@ export function SourceCard({
   contextMode,
   onContextModeChange
 }: SourceCardProps) {
-  
+
   // Only fetch status for sources that might have async processing
   const sourceWithStatus = source as SourceListResponse & { command_id?: string; status?: string }
 
@@ -162,12 +162,12 @@ export function SourceCard({
       }
     }
   }, [statusData, sourceWithStatus.status, wasProcessing, onRefresh, source.id])
-  
+
   const statusConfig = STATUS_CONFIG[currentStatus] || STATUS_CONFIG.completed
   const StatusIcon = statusConfig.icon
   const sourceType = getSourceType(source)
   const SourceTypeIcon = SOURCE_TYPE_ICONS[sourceType]
-  
+
   const title = source.title || 'Untitled Source'
 
   const handleRetry = () => {

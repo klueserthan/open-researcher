@@ -65,8 +65,8 @@ export function TemplatesTab() {
       </div>
 
       <Accordion type="single" collapsible className="w-full">
-        <AccordionItem 
-          value="overview" 
+        <AccordionItem
+          value="overview"
           className="overflow-hidden rounded-xl border border-border bg-muted/40 px-4"
         >
           <AccordionTrigger className="gap-2 py-4 text-left text-sm font-semibold">

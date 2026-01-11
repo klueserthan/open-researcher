@@ -28,19 +28,19 @@ function StepIndicator({ currentStep, steps, onStepClick }: {
         const isCompleted = currentStep > step.number
         const isCurrent = currentStep === step.number
         const isClickable = step.number <= currentStep && onStepClick
-        
+
         return (
           <div key={step.number} className="flex items-center flex-1">
-            <div 
+            <div
               className={cn('flex items-center', isClickable && 'cursor-pointer')}
               onClick={isClickable ? () => onStepClick(step.number) : undefined}
             >
               <div
                 className={cn(
                   'flex items-center justify-center w-8 h-8 rounded-full border-2 text-sm font-medium transition-colors',
-                  isCompleted 
-                    ? 'bg-primary border-primary text-primary-foreground' 
-                    : isCurrent 
+                  isCompleted
+                    ? 'bg-primary border-primary text-primary-foreground'
+                    : isCurrent
                       ? 'border-primary text-primary bg-primary/10'
                       : 'border-border text-muted-foreground bg-card'
                 )}
@@ -63,11 +63,11 @@ function StepIndicator({ currentStep, steps, onStepClick }: {
               </div>
             </div>
             {index < steps.length - 1 && (
-              <div 
+              <div
                 className={cn(
                   'flex-1 border-t-2 mx-4 transition-colors',
                   isCompleted ? 'border-primary' : 'border-border/60'
-                )} 
+                )}
               />
             )}
           </div>
@@ -86,12 +86,12 @@ export function WizardContainer({
 }: WizardContainerProps) {
   return (
     <div className={cn('flex flex-col h-[500px] bg-card rounded-lg border border-border', className)}>
-      <StepIndicator 
+      <StepIndicator
         currentStep={currentStep}
         steps={steps}
         onStepClick={onStepClick}
       />
-      
+
       <div className="flex-1 overflow-hidden">
         <div className="h-full overflow-y-auto px-6 py-4">
           {children}

@@ -46,7 +46,7 @@ export function NotebookCard({ notebook }: NotebookCardProps) {
 
   return (
     <>
-      <Card 
+      <Card
         className="group card-hover"
         onClick={handleCardClick}
         style={{ cursor: 'pointer' }}
@@ -63,7 +63,7 @@ export function NotebookCard({ notebook }: NotebookCardProps) {
                   </Badge>
                 )}
               </div>
-              
+
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
@@ -103,7 +103,7 @@ export function NotebookCard({ notebook }: NotebookCardProps) {
               </DropdownMenu>
             </div>
           </CardHeader>
-          
+
           <CardContent>
             <CardDescription className="line-clamp-2 text-sm">
               {notebook.description || 'No description'}

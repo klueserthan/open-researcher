@@ -54,18 +54,18 @@ export default function TransformationsPage() {
               </TabsTrigger>
             </TabsList>
           </div>
-          
+
           <TabsContent value="transformations" className="space-y-6">
             <DefaultPromptEditor />
-            <TransformationsList 
-              transformations={transformations} 
+            <TransformationsList
+              transformations={transformations}
               isLoading={isLoading}
               onPlayground={handlePlayground}
             />
           </TabsContent>
-          
+
           <TabsContent value="playground">
-            <TransformationPlayground 
+            <TransformationPlayground
               transformations={transformations}
               selectedTransformation={selectedTransformation}
             />

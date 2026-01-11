@@ -2,24 +2,24 @@
 REMOVE FUNCTION IF EXISTS fn::vector_search;
 
 DEFINE FUNCTION IF NOT EXISTS fn::vector_search($query: array<float>, $match_count: int, $sources: bool, $show_notes: bool, $min_similarity: float) {
-    let $source_embedding_search = 
+    let $source_embedding_search =
         IF $sources {(
-            SELECT 
+            SELECT
                 source.id as id,
                 source.title as title,
                 content,
                 source.id as parent_id,
                 vector::similarity::cosine(embedding, $query) as similarity
-            FROM source_embedding 
+            FROM source_embedding
             WHERE vector::similarity::cosine(embedding, $query) >= $min_similarity
             ORDER BY similarity DESC
             LIMIT $match_count
         )}
         ELSE { [] };
 
-    let $source_insight_search = 
+    let $source_insight_search =
         IF $sources {(
-            SELECT 
+            SELECT
                 id,
                 insight_type + ' - ' + (source.title OR '') as title,
                 content,
@@ -33,9 +33,9 @@ DEFINE FUNCTION IF NOT EXISTS fn::vector_search($query: array<float>, $match_cou
         ELSE { [] };
 
 
-    let $note_content_search = 
+    let $note_content_search =
         IF $show_notes {(
-            SELECT 
+            SELECT
                 id,
                 title,
                 content,

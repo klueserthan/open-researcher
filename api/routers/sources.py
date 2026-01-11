@@ -125,9 +125,7 @@ def parse_source_form_data(
         try:
             transformations_list = json.loads(transformations)
         except json.JSONDecodeError:
-            logger.error(
-                f"Invalid JSON in transformations field: {transformations}"
-            )
+            logger.error(f"Invalid JSON in transformations field: {transformations}")
             raise ValueError("Invalid JSON in transformations field")
 
     # Create SourceCreate instance
@@ -157,18 +155,26 @@ def parse_source_form_data(
 @router.get("/sources", response_model=List[SourceListResponse])
 async def get_sources(
     notebook_id: Optional[str] = Query(None, description="Filter by notebook ID"),
-    limit: int = Query(50, ge=1, le=100, description="Number of sources to return (1-100)"),
+    limit: int = Query(
+        50, ge=1, le=100, description="Number of sources to return (1-100)"
+    ),
     offset: int = Query(0, ge=0, description="Number of sources to skip"),
-    sort_by: str = Query("updated", description="Field to sort by (created or updated)"),
+    sort_by: str = Query(
+        "updated", description="Field to sort by (created or updated)"
+    ),
     sort_order: str = Query("desc", description="Sort order (asc or desc)"),
 ):
     """Get sources with pagination and sorting support."""
     try:
         # Validate sort parameters
         if sort_by not in ["created", "updated"]:
-            raise HTTPException(status_code=400, detail="sort_by must be 'created' or 'updated'")
+            raise HTTPException(
+                status_code=400, detail="sort_by must be 'created' or 'updated'"
+            )
         if sort_order.lower() not in ["asc", "desc"]:
-            raise HTTPException(status_code=400, detail="sort_order must be 'asc' or 'desc'")
+            raise HTTPException(
+                status_code=400, detail="sort_order must be 'asc' or 'desc'"
+            )
 
         # Build ORDER BY clause
         order_clause = f"ORDER BY {sort_by} {sort_order.upper()}"
@@ -190,11 +196,12 @@ async def get_sources(
                 LIMIT $limit START $offset
             """
             result = await repo_query(
-                query, {
+                query,
+                {
                     "notebook_id": ensure_record_id(notebook_id),
                     "limit": limit,
-                    "offset": offset
-                }
+                    "offset": offset,
+                },
             )
         else:
             # Query all sources - include command field
@@ -277,8 +284,14 @@ async def get_sources(
                 if status_obj:
                     status = status_obj.status
                     # Extract execution metadata from nested result structure
-                    result_data: dict[str, Any] | None = getattr(status_obj, "result", None)
-                    execution_metadata: dict[str, Any] = result_data.get("execution_metadata", {}) if isinstance(result_data, dict) else {}
+                    result_data: dict[str, Any] | None = getattr(
+                        status_obj, "result", None
+                    )
+                    execution_metadata: dict[str, Any] = (
+                        result_data.get("execution_metadata", {})
+                        if isinstance(result_data, dict)
+                        else {}
+                    )
                     processing_info = {
                         "started_at": execution_metadata.get("started_at"),
                         "completed_at": execution_metadata.get("completed_at"),
@@ -332,7 +345,7 @@ async def create_source(
 
     try:
         # Verify all specified notebooks exist (backward compatibility support)
-        for notebook_id in (source_data.notebooks or []):
+        for notebook_id in source_data.notebooks or []:
             notebook = await Notebook.get(notebook_id)
             if not notebook:
                 raise HTTPException(
@@ -379,30 +392,31 @@ async def create_source(
             # Handle Zotero source type
             if not source_data.zotero_item_key:
                 raise HTTPException(
-                    status_code=400, detail="Zotero item key is required for zotero type"
+                    status_code=400,
+                    detail="Zotero item key is required for zotero type",
                 )
-            
+
             try:
                 # Get Zotero client
                 zotero_client = get_zotero_client()
-                
+
                 # Fetch item from Zotero
                 item = zotero_client.get_item(source_data.zotero_item_key)
-                
+
                 # Format item for source creation
                 formatted = zotero_client.format_item_for_source(item)
-                
+
                 # Use the formatted content as text content
                 content_state["content"] = formatted.get("content", "")
-                
+
                 # Override title if not provided
                 if not source_data.title:
                     source_data.title = formatted.get("title")
-                
+
                 # Store URL if available (for attachment or item URL)
                 if formatted.get("url"):
                     content_state["url"] = formatted.get("url")
-                    
+
             except ValueError as e:
                 raise HTTPException(
                     status_code=400,
@@ -443,7 +457,7 @@ async def create_source(
 
             # Add source to notebooks immediately so it appears in the UI
             # The source_graph will skip adding duplicates
-            for notebook_id in (source_data.notebooks or []):
+            for notebook_id in source_data.notebooks or []:
                 await source.add_to_notebook(notebook_id)
 
             try:
@@ -522,7 +536,7 @@ async def create_source(
 
                 # Add source to notebooks immediately so it appears in the UI
                 # The source_graph will skip adding duplicates
-                for notebook_id in (source_data.notebooks or []):
+                for notebook_id in source_data.notebooks or []:
                     await source.add_to_notebook(notebook_id)
 
                 # Execute command synchronously
@@ -561,9 +575,7 @@ async def create_source(
 
                 # Get the processed source
                 if not source.id:
-                    raise HTTPException(
-                        status_code=500, detail="Source ID is missing"
-                    )
+                    raise HTTPException(status_code=500, detail="Source ID is missing")
                 processed_source = await Source.get(source.id)
                 if not processed_source:
                     raise HTTPException(
@@ -701,9 +713,11 @@ async def get_source(source_id: str):
         # Get associated notebooks
         notebooks_query = await repo_query(
             "SELECT VALUE out FROM reference WHERE in = $source_id",
-            {"source_id": ensure_record_id(source.id or source_id)}
+            {"source_id": ensure_record_id(source.id or source_id)},
         )
-        notebook_ids = [str(nb_id) for nb_id in notebooks_query] if notebooks_query else []
+        notebook_ids = (
+            [str(nb_id) for nb_id in notebooks_query] if notebooks_query else []
+        )
 
         return SourceResponse(
             id=source.id or "",
@@ -1122,9 +1136,10 @@ async def search_zotero(request: ZoteroSearchRequest):
             # Extract authors from creators using shared helper
             creators = data.get("creators", []) or []
             author_dicts = zotero_client.extract_authors_from_creators(creators)
-            
+
             # Convert to ZoteroAuthor objects
             from api.models import ZoteroAuthor
+
             authors = [ZoteroAuthor(**author) for author in author_dicts]
 
             # Extract year from date field
@@ -1167,4 +1182,6 @@ async def search_zotero(request: ZoteroSearchRequest):
         raise
     except Exception as e:
         logger.error(f"Error searching Zotero: {str(e)}")
-        raise HTTPException(status_code=500, detail="Error searching Zotero. Please try again later.")
+        raise HTTPException(
+            status_code=500, detail="Error searching Zotero. Please try again later."
+        )

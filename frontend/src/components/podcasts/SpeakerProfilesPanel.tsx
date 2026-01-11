@@ -56,7 +56,7 @@ export function SpeakerProfilesPanel({
 
   const sortedProfiles = useMemo(
     () =>
-      [...speakerProfiles].sort((a, b) => a.name.localeCompare(b.name, 'en')), 
+      [...speakerProfiles].sort((a, b) => a.name.localeCompare(b.name, 'en')),
     [speakerProfiles]
   )
 

@@ -94,10 +94,10 @@ interface BatchProgress {
   currentItem?: string
 }
 
-export function AddSourceDialog({ 
-  open, 
-  onOpenChange, 
-  defaultNotebookId 
+export function AddSourceDialog({
+  open,
+  onOpenChange,
+  defaultNotebookId
 }: AddSourceDialogProps) {
   // Simplified state management
   const [currentStep, setCurrentStep] = useState(1)
@@ -107,7 +107,7 @@ export function AddSourceDialog({
     defaultNotebookId ? [defaultNotebookId] : []
   )
   const [selectedTransformations, setSelectedTransformations] = useState<string[]>([])
-  
+
   // Key to force remount of SourceTypeStep when dialog is opened
   const [dialogKey, setDialogKey] = useState(0)
 
@@ -440,7 +440,7 @@ export function AddSourceDialog({
     setSelectedNotebooks(defaultNotebookId ? [defaultNotebookId] : [])
     setUrlValidationErrors([])
     setBatchProgress(null)
-    
+
     // Increment key to force remount of SourceTypeStep (resets Zotero state)
     setDialogKey(prev => prev + 1)
 
@@ -569,7 +569,7 @@ export function AddSourceDialog({
                 setValue={setValue}
               />
             )}
-            
+
             {currentStep === 2 && (
               <NotebooksStep
                 notebooks={notebooks}
@@ -578,7 +578,7 @@ export function AddSourceDialog({
                 loading={notebooksLoading}
               />
             )}
-            
+
             {currentStep === 3 && (
               <ProcessingStep
                 // @ts-expect-error - Type inference issue with zod schema
@@ -594,9 +594,9 @@ export function AddSourceDialog({
 
           {/* Navigation */}
           <div className="flex justify-between items-center px-6 py-4 border-t border-border bg-muted">
-            <Button 
-              type="button" 
-              variant="outline" 
+            <Button
+              type="button"
+              variant="outline"
               onClick={handleClose}
             >
               Cancel

@@ -35,7 +35,7 @@ export function ProviderStatus({ providers }: ProviderStatusProps) {
       <CardHeader>
         <CardTitle>AI Providers</CardTitle>
         <CardDescription>
-          Configure providers through environment variables to enable their models. 
+          Configure providers through environment variables to enable their models.
           <span className="ml-1">
             {providers.available.length} of {allProviders.length} configured
           </span>

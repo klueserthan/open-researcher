@@ -56,7 +56,7 @@ Format: KEY=value, one per line
 
 ### `docker.env` (Docker Deployment)
 
-You will use this file to hold your environment variables if you are using docker-compose and prefer not to put the variables directly in the compose file. 
+You will use this file to hold your environment variables if you are using docker-compose and prefer not to put the variables directly in the compose file.
 ```
 Located in: project root (or ./docker)
 Use for: Docker deployments
@@ -88,7 +88,7 @@ SURREAL_DATABASE=open_notebook
 
 ### AI Provider (API Key or URL)
 
-We need access to LLMs in order for the app to work. You can use any of the support AI Providers by adding their API Keys. 
+We need access to LLMs in order for the app to work. You can use any of the support AI Providers by adding their API Keys.
 
 ```
 OPENAI_API_KEY=sk-...
@@ -97,7 +97,7 @@ GOOGLE_API_KEY=...
 OPENROUTER_API_KEY=...
 ```
 
-Or, if you are planning to use only local providers, you can setup Ollama by configuring it's base URL. This will get you set and ready with text and embeddings in one go: 
+Or, if you are planning to use only local providers, you can setup Ollama by configuring it's base URL. This will get you set and ready with text and embeddings in one go:
 
 ```
 OLLAMA_BASE_URL=http://localhost:11434
@@ -105,7 +105,7 @@ OLLAMA_BASE_URL=http://localhost:11434
 
 > A lot of people screw up on the Ollama BASE URL by not knowing how to point to their Ollama installation. if you are having trouble connecting to Ollama, see [here](ollama.md).
 
-You can also use LM Studio locally if you prefer by using it as an OpenAI compatible endpoint. 
+You can also use LM Studio locally if you prefer by using it as an OpenAI compatible endpoint.
 
 ```
 OPENAI_COMPATIBLE_BASE_URL=http://localhost:1234/v1

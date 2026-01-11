@@ -127,10 +127,10 @@ tag:
 
 
 dev:
-	docker compose -f docker-compose.dev.yml up --build 
+	docker compose -f docker-compose.dev.yml up --build
 
 full:
-	docker compose -f docker-compose.full.yml up --build 
+	docker compose -f docker-compose.full.yml up --build
 
 
 api:

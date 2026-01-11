@@ -3,7 +3,7 @@
 -- This migration allows chat_session to refer to either a notebook or a source
 
 DEFINE TABLE OVERWRITE refers_to
-TYPE RELATION 
+TYPE RELATION
 FROM chat_session TO notebook|source;
 
 -- Add model_override field to chat_session for per-session model selection
