@@ -1126,8 +1126,8 @@ async def search_zotero(request: ZoteroSearchRequest):
             # Extract year from date field
             date_str = data.get("date", "")
             year = ""
-            if date_str and len(date_str) >= 4:
-                year = date_str[:4] if date_str[:4].isdigit() else ""
+            if date_str and len(date_str) >= 4 and date_str[:4].isdigit():
+                year = date_str[:4]
 
             item_type = data.get("itemType", "")
             publication = data.get("publicationTitle", "")
