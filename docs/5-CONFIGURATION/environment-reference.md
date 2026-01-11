@@ -223,6 +223,25 @@ For self-hosted LLMs, LM Studio, or OpenAI-compatible endpoints:
 
 ---
 
+## Research Tools: Zotero
+
+| Variable | Required? | Default | Description |
+|----------|-----------|---------|-------------|
+| `ZOTERO_API_KEY` | If using Zotero | None | Zotero API key for accessing your library |
+| `ZOTERO_USER_ID` | If using personal library | None | Your Zotero user ID (numeric) |
+| `ZOTERO_GROUP_ID` | If using group library | None | Zotero group ID (numeric) |
+| `ZOTERO_LIBRARY_TYPE` | No | user | Library type: 'user' or 'group' |
+
+**Setup:**
+1. Go to https://www.zotero.org/settings/keys
+2. Create a new API key with read access to your library
+3. Find your user ID in your Zotero profile URL (e.g., https://www.zotero.org/users/12345 → user ID is 12345)
+4. For group libraries, use the group ID from the group's URL
+
+**Note:** You can configure either a personal library (ZOTERO_USER_ID) or a group library (ZOTERO_GROUP_ID). If both are set, the personal library (ZOTERO_USER_ID) takes precedence.
+
+---
+
 ## Debugging & Monitoring
 
 | Variable | Required? | Default | Description |

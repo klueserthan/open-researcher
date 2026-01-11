@@ -7,7 +7,9 @@ import {
   SourceResponse,
   SourceStatusResponse,
   CreateSourceRequest, 
-  UpdateSourceRequest 
+  UpdateSourceRequest,
+  ZoteroSearchRequest,
+  ZoteroItemResponse
 } from '@/lib/types/api'
 
 export const sourcesApi = {
@@ -62,6 +64,11 @@ export const sourcesApi = {
     formData.append('delete_source', String(data.delete_source ?? false))
     formData.append('async_processing', String(data.async_processing ?? false))
     
+    // Add Zotero-specific field
+    if (data.zotero_item_key) {
+      formData.append('zotero_item_key', data.zotero_item_key)
+    }
+    
     const response = await apiClient.post<SourceResponse>('/sources', formData)
     return response.data
   },
@@ -104,5 +111,10 @@ export const sourcesApi = {
     return apiClient.get(`/sources/${id}/download`, {
       responseType: 'blob',
     })
+  },
+
+  searchZotero: async (request: ZoteroSearchRequest) => {
+    const response = await apiClient.post<ZoteroItemResponse[]>('/sources/zotero/search', request)
+    return response.data
   },
 }

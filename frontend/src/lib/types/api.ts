@@ -84,7 +84,7 @@ export interface CreateSourceRequest {
   // New multi-notebook support
   notebooks?: string[]
   // Required fields
-  type: 'link' | 'upload' | 'text'
+  type: 'link' | 'upload' | 'text' | 'zotero'
   url?: string
   file_path?: string
   content?: string
@@ -94,6 +94,26 @@ export interface CreateSourceRequest {
   delete_source?: boolean
   // New async processing support
   async_processing?: boolean
+  // Zotero-specific fields
+  zotero_item_key?: string
+}
+
+export interface ZoteroSearchRequest {
+  query: string
+  search_fields?: string[]
+  limit?: number
+}
+
+export interface ZoteroItemResponse {
+  key: string
+  title: string
+  authors: string[]
+  year: string
+  item_type: string
+  publication: string
+  abstract: string
+  url?: string
+  attachment_url?: string
 }
 
 export interface UpdateNoteRequest {

@@ -23,3 +23,9 @@ services:
     volumes:
       - ./notebook_data:/app/data
     restart: always
+    # Optional Zotero configuration - uncomment to enable
+    # environment:
+    #   - ZOTERO_API_KEY=${ZOTERO_API_KEY}
+    #   - ZOTERO_USER_ID=${ZOTERO_USER_ID}
+    #   - ZOTERO_GROUP_ID=${ZOTERO_GROUP_ID}
+    #   - ZOTERO_LIBRARY_TYPE=${ZOTERO_LIBRARY_TYPE:-user}

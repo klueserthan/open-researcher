@@ -283,7 +283,7 @@ class SourceCreate(BaseModel):
         None, description="List of notebook IDs to add the source to"
     )
     # Required fields
-    type: str = Field(..., description="Source type: link, upload, or text")
+    type: str = Field(..., description="Source type: link, upload, text, or zotero")
     url: Optional[str] = Field(None, description="URL for link type")
     file_path: Optional[str] = Field(None, description="File path for upload type")
     content: Optional[str] = Field(None, description="Text content for text type")
@@ -298,6 +298,10 @@ class SourceCreate(BaseModel):
     # New async processing support
     async_processing: bool = Field(
         False, description="Whether to process source asynchronously"
+    )
+    # Zotero-specific fields
+    zotero_item_key: Optional[str] = Field(
+        None, description="Zotero item key for zotero type"
     )
 
     @model_validator(mode="after")
@@ -318,6 +322,55 @@ class SourceCreate(BaseModel):
             self.notebooks = []
 
         return self
+
+    @model_validator(mode="after")
+    def validate_source_type_fields(self):
+        # Validate that zotero_item_key is provided for zotero type
+        if self.type == "zotero":
+            if not self.zotero_item_key or not self.zotero_item_key.strip():
+                raise ValueError("zotero_item_key is required for zotero type")
+            # Normalize to trimmed value
+            self.zotero_item_key = self.zotero_item_key.strip()
+        
+        return self
+
+
+class ZoteroSearchRequest(BaseModel):
+    query: str = Field(..., description="Search query text")
+    search_fields: Optional[List[str]] = Field(
+        None,
+        description="Fields to search in: title, creator, fulltext. Default: title and creator",
+    )
+    limit: int = Field(100, ge=1, le=500, description="Maximum number of results")
+    
+    @model_validator(mode="after")
+    def validate_query(self):
+        if not self.query or not self.query.strip():
+            raise ValueError("Search query cannot be empty")
+        return self
+
+
+class ZoteroAuthor(BaseModel):
+    """Author information from Zotero."""
+    name: str = Field(..., description="Author full name")
+    first_name: str = Field(default="", description="Author first name")
+    last_name: str = Field(default="", description="Author last name")
+
+
+class ZoteroItemResponse(BaseModel):
+    key: str = Field(..., description="Zotero item key")
+    title: str = Field(..., description="Item title")
+    authors: List[ZoteroAuthor] = Field(default_factory=list, description="List of authors")
+    year: str = Field(default="", description="Publication year")
+    item_type: str = Field(default="", description="Item type (article, book, etc.)")
+    publication: str = Field(default="", description="Publication name")
+    volume: str = Field(default="", description="Volume number")
+    issue: str = Field(default="", description="Issue number")
+    abstract: str = Field(default="", description="Abstract or summary")
+    doi: str = Field(default="", description="DOI identifier")
+    isbn: str = Field(default="", description="ISBN identifier")
+    url: Optional[str] = Field(None, description="Item URL")
+    attachment_url: Optional[str] = Field(None, description="Attachment URL if available")
 
 
 class SourceUpdate(BaseModel):
