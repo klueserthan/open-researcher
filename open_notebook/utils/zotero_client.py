@@ -185,28 +185,44 @@ class ZoteroClient:
             logger.warning(f"Error getting attachment URL: {e}")
             return None
     
-    def extract_authors_from_creators(self, creators: List[Dict[str, Any]]) -> List[str]:
+    def extract_authors_from_creators(self, creators: List[Dict[str, Any]]) -> List[Dict[str, str]]:
         """
-        Extract a list of author names from Zotero creators.
+        Extract a list of author dictionaries from Zotero creators.
         
         Args:
             creators: List of creator dictionaries from Zotero item
             
         Returns:
-            List of formatted author names
+            List of author dictionaries with 'name', 'first_name', and 'last_name' keys
         """
         authors = []
         for creator in creators:
             if not isinstance(creator, dict):
                 continue
-            first_name = creator.get("firstName", "")
-            last_name = creator.get("lastName", "")
-            name = creator.get("name", "")  # For organizations
+            first_name = creator.get("firstName", "") or ""
+            last_name = creator.get("lastName", "") or ""
+            name = creator.get("name", "") or ""  # For organizations
+            
+            # Strip whitespace
+            first_name = first_name.strip()
+            last_name = last_name.strip()
+            name = name.strip()
             
             if name:
-                authors.append(name)
+                # Organization name
+                authors.append({
+                    "name": name,
+                    "first_name": "",
+                    "last_name": ""
+                })
             elif first_name or last_name:
-                authors.append(f"{first_name} {last_name}".strip())
+                # Individual author
+                full_name = f"{first_name} {last_name}".strip()
+                authors.append({
+                    "name": full_name,
+                    "first_name": first_name,
+                    "last_name": last_name
+                })
         return authors
 
     def format_item_for_source(self, item: Dict[str, Any]) -> Dict[str, Any]:

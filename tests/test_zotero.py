@@ -173,10 +173,11 @@ class TestZoteroClientSearch:
 
     def test_search_invalid_fields_warning(self, caplog):
         """Test warning is logged for invalid search fields."""
+        import logging
         mock_items = []
         self.client.zot.items = Mock(return_value=mock_items)
         
-        with caplog.at_level("WARNING"):
+        with caplog.at_level(logging.WARNING):
             self.client.search("test", search_fields=["invalid", "field", "title"])
         
         # Check warning was logged
