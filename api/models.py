@@ -303,7 +303,6 @@ class SourceCreate(BaseModel):
     zotero_item_key: Optional[str] = Field(
         None, description="Zotero item key for zotero type"
     )
-    )
 
     @model_validator(mode="after")
     def validate_notebook_fields(self):
