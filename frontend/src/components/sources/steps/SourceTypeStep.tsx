@@ -1,18 +1,22 @@
 "use client"
 
-import { useMemo } from "react"
+import { useMemo, useState } from "react"
 import { Control, FieldErrors, UseFormRegister, useWatch } from "react-hook-form"
-import { FileIcon, LinkIcon, FileTextIcon } from "lucide-react"
+import { FileIcon, LinkIcon, FileTextIcon, BookOpenIcon, SearchIcon, LoaderIcon } from "lucide-react"
 import { FormSection } from "@/components/ui/form-section"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import { Controller } from "react-hook-form"
+import { sourcesApi } from "@/lib/api/sources"
+import type { ZoteroItemResponse } from "@/lib/types/api"
+import { toast } from "sonner"
 
 interface CreateSourceFormData {
-  type: 'link' | 'upload' | 'text'
+  type: 'link' | 'upload' | 'text' | 'zotero'
   title?: string
   url?: string
   content?: string
@@ -21,6 +25,7 @@ interface CreateSourceFormData {
   transformations?: string[]
   embed: boolean
   async_processing: boolean
+  zotero_item_key?: string
 }
 
 // Helper functions for batch URL parsing
@@ -81,6 +86,12 @@ const SOURCE_TYPES = [
     icon: FileTextIcon,
     description: 'Add text content directly',
   },
+  {
+    value: 'zotero' as const,
+    label: 'Zotero',
+    icon: BookOpenIcon,
+    description: 'Import from Zotero library',
+  },
 ]
 
 interface SourceTypeStepProps {
@@ -98,6 +109,12 @@ export function SourceTypeStep({ control, register, errors, urlValidationErrors,
   const selectedType = useWatch({ control, name: 'type' })
   const urlInput = useWatch({ control, name: 'url' })
   const fileInput = useWatch({ control, name: 'file' })
+
+  // Zotero search state
+  const [zoteroSearchQuery, setZoteroSearchQuery] = useState('')
+  const [zoteroSearching, setZoteroSearching] = useState(false)
+  const [zoteroResults, setZoteroResults] = useState<ZoteroItemResponse[]>([])
+  const [selectedZoteroItem, setSelectedZoteroItem] = useState<ZoteroItemResponse | null>(null)
 
   // Batch mode detection
   const { isBatchMode, itemCount, urlCount, fileCount } = useMemo(() => {
@@ -120,6 +137,33 @@ export function SourceTypeStep({ control, register, errors, urlValidationErrors,
     return { isBatchMode, itemCount, urlCount, fileCount }
   }, [selectedType, urlInput, fileInput])
 
+  // Zotero search handler
+  const handleZoteroSearch = async () => {
+    if (!zoteroSearchQuery.trim()) {
+      toast.error('Please enter a search query')
+      return
+    }
+
+    setZoteroSearching(true)
+    try {
+      const results = await sourcesApi.searchZotero({
+        query: zoteroSearchQuery,
+        limit: 20
+      })
+      setZoteroResults(results)
+      
+      if (results.length === 0) {
+        toast.info('No results found')
+      }
+    } catch (error: unknown) {
+      console.error('Zotero search failed:', error)
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+      toast.error(`Zotero search failed: ${errorMessage}`)
+    } finally {
+      setZoteroSearching(false)
+    }
+  }
+
   // Check for batch size limit
   const isOverLimit = itemCount > MAX_BATCH_SIZE
   return (
@@ -134,10 +178,17 @@ export function SourceTypeStep({ control, register, errors, urlValidationErrors,
           render={({ field }) => (
             <Tabs 
               value={field.value || ''} 
-              onValueChange={(value) => field.onChange(value as 'link' | 'upload' | 'text')}
+              onValueChange={(value) => {
+                field.onChange(value as 'link' | 'upload' | 'text' | 'zotero')
+                // Reset Zotero state when switching away
+                if (value !== 'zotero') {
+                  setZoteroResults([])
+                  setSelectedZoteroItem(null)
+                }
+              }}
               className="w-full"
             >
-              <TabsList className="grid w-full grid-cols-3">
+              <TabsList className="grid w-full grid-cols-4">
                 {SOURCE_TYPES.map((type) => {
                   const Icon = type.icon
                   return (
@@ -265,6 +316,106 @@ export function SourceTypeStep({ control, register, errors, urlValidationErrors,
                       )}
                     </div>
                   )}
+                  
+                  {type.value === 'zotero' && (
+                    <div className="space-y-4">
+                      {/* Zotero Search */}
+                      <div>
+                        <Label htmlFor="zotero_search">Search Zotero Library</Label>
+                        <div className="flex gap-2 mt-2">
+                          <Input
+                            id="zotero_search"
+                            value={zoteroSearchQuery}
+                            onChange={(e) => setZoteroSearchQuery(e.target.value)}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') {
+                                e.preventDefault()
+                                handleZoteroSearch()
+                              }
+                            }}
+                            placeholder="Search by title, author, or metadata..."
+                            disabled={zoteroSearching}
+                          />
+                          <Button 
+                            type="button" 
+                            onClick={handleZoteroSearch}
+                            disabled={zoteroSearching || !zoteroSearchQuery.trim()}
+                          >
+                            {zoteroSearching ? (
+                              <LoaderIcon className="h-4 w-4 animate-spin" />
+                            ) : (
+                              <SearchIcon className="h-4 w-4" />
+                            )}
+                          </Button>
+                        </div>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Search your Zotero library by title, author, or other metadata
+                        </p>
+                      </div>
+
+                      {/* Search Results */}
+                      {zoteroResults.length > 0 && (
+                        <div className="border rounded-lg overflow-hidden">
+                          <div className="bg-muted px-3 py-2 border-b">
+                            <p className="text-sm font-medium">{zoteroResults.length} result{zoteroResults.length !== 1 ? 's' : ''} found</p>
+                          </div>
+                          <div className="max-h-96 overflow-y-auto">
+                            {zoteroResults.map((item) => (
+                              <div
+                                key={item.key}
+                                className={`p-3 border-b last:border-b-0 cursor-pointer hover:bg-muted/50 transition-colors ${
+                                  selectedZoteroItem?.key === item.key ? 'bg-primary/10' : ''
+                                }`}
+                                onClick={() => {
+                                  setSelectedZoteroItem(item)
+                                  // Update form field with item key
+                                  const zoteroKeyInput = document.querySelector('input[name="zotero_item_key"]') as HTMLInputElement
+                                  if (zoteroKeyInput) {
+                                    zoteroKeyInput.value = item.key
+                                    // Trigger change event for react-hook-form
+                                    const event = new Event('input', { bubbles: true })
+                                    zoteroKeyInput.dispatchEvent(event)
+                                  }
+                                }}
+                              >
+                                <div className="flex items-start justify-between gap-2">
+                                  <div className="flex-1 min-w-0">
+                                    <h4 className="text-sm font-medium truncate">{item.title}</h4>
+                                    {item.authors.length > 0 && (
+                                      <p className="text-xs text-muted-foreground mt-1">
+                                        {item.authors.join(', ')}
+                                      </p>
+                                    )}
+                                    {item.year && (
+                                      <p className="text-xs text-muted-foreground">{item.year}</p>
+                                    )}
+                                    {item.abstract && (
+                                      <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
+                                        {item.abstract}
+                                      </p>
+                                    )}
+                                  </div>
+                                  {selectedZoteroItem?.key === item.key && (
+                                    <Badge variant="default" className="shrink-0">Selected</Badge>
+                                  )}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Hidden field for form submission */}
+                      <input
+                        type="hidden"
+                        {...register('zotero_item_key')}
+                      />
+                      
+                      {errors.zotero_item_key && (
+                        <p className="text-sm text-destructive">{errors.zotero_item_key.message}</p>
+                      )}
+                    </div>
+                  )}
                 </TabsContent>
               ))}
             </Tabs>
@@ -276,7 +427,7 @@ export function SourceTypeStep({ control, register, errors, urlValidationErrors,
       </FormSection>
 
       {/* Hide title field in batch mode - titles will be auto-generated */}
-      {!isBatchMode && (
+      {!isBatchMode && selectedType !== 'zotero' && (
         <FormSection
           title={selectedType === 'text' ? "Title *" : "Title (optional)"}
           description={selectedType === 'text'
@@ -293,6 +444,26 @@ export function SourceTypeStep({ control, register, errors, urlValidationErrors,
             <p className="text-sm text-destructive mt-1">{errors.title.message}</p>
           )}
         </FormSection>
+      )}
+
+      {/* Selected Zotero item info */}
+      {selectedType === 'zotero' && selectedZoteroItem && (
+        <div className="p-4 bg-primary/5 border border-primary/20 rounded-lg">
+          <div className="flex items-start gap-3">
+            <BookOpenIcon className="h-5 w-5 text-primary mt-0.5" />
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium">Selected: {selectedZoteroItem.title}</p>
+              {selectedZoteroItem.authors.length > 0 && (
+                <p className="text-xs text-muted-foreground mt-1">
+                  {selectedZoteroItem.authors.join(', ')}
+                </p>
+              )}
+              {selectedZoteroItem.year && (
+                <p className="text-xs text-muted-foreground">{selectedZoteroItem.year}</p>
+              )}
+            </div>
+          </div>
+        </div>
       )}
 
       {/* Batch mode indicator */}

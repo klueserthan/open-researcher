@@ -27,7 +27,7 @@ import { CreateSourceRequest } from '@/lib/types/api'
 const MAX_BATCH_SIZE = 50
 
 const createSourceSchema = z.object({
-  type: z.enum(['link', 'upload', 'text']),
+  type: z.enum(['link', 'upload', 'text', 'zotero']),
   title: z.string().optional(),
   url: z.string().optional(),
   content: z.string().optional(),
@@ -36,6 +36,7 @@ const createSourceSchema = z.object({
   transformations: z.array(z.string()).optional(),
   embed: z.boolean(),
   async_processing: z.boolean(),
+  zotero_item_key: z.string().optional(),
 }).refine((data) => {
   if (data.type === 'link') {
     return !!data.url && data.url.trim() !== ''
@@ -48,6 +49,9 @@ const createSourceSchema = z.object({
       return data.file.length > 0
     }
     return !!data.file
+  }
+  if (data.type === 'zotero') {
+    return !!data.zotero_item_key && data.zotero_item_key.trim() !== ''
   }
   return true
 }, {
