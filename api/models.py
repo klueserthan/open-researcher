@@ -339,7 +339,7 @@ class ZoteroSearchRequest(BaseModel):
     query: str = Field(..., description="Search query text")
     search_fields: Optional[List[str]] = Field(
         None,
-        description="Fields to search in: title, creator, year, tag, note, fulltext. Default: title and creator",
+        description="Fields to search in: title, creator, fulltext. Default: title and creator",
     )
     limit: int = Field(100, ge=1, le=500, description="Maximum number of results")
     

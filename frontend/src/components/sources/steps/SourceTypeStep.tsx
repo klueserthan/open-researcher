@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useMemo, useState, useEffect } from "react"
+import React, { useMemo, useState } from "react"
 import { Control, FieldErrors, UseFormRegister, useWatch } from "react-hook-form"
 import { FileIcon, LinkIcon, FileTextIcon, BookOpenIcon, SearchIcon, LoaderIcon } from "lucide-react"
 import { FormSection } from "@/components/ui/form-section"
@@ -195,6 +195,8 @@ export function SourceTypeStep({ control, register, errors, urlValidationErrors,
                     setValue('content', '')
                     setValue('file', undefined as unknown as FileList | File)
                   }
+                  // Reset Zotero search query for clean state
+                  setZoteroSearchQuery('')
                 }
               }}
               className="w-full"

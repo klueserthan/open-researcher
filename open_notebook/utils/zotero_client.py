@@ -185,7 +185,7 @@ class ZoteroClient:
             logger.warning(f"Error getting attachment URL: {e}")
             return None
     
-    def _extract_authors_from_creators(self, creators: List[Dict[str, Any]]) -> List[str]:
+    def extract_authors_from_creators(self, creators: List[Dict[str, Any]]) -> List[str]:
         """
         Extract a list of author names from Zotero creators.
         
@@ -226,7 +226,7 @@ class ZoteroClient:
 
         # Extract creators (authors, editors, etc.)
         creators = data.get("creators", [])
-        authors = self._extract_authors_from_creators(creators)
+        authors = self.extract_authors_from_creators(creators)
 
         # Extract abstract/content
         abstract = data.get("abstractNote", "")

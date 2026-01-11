@@ -1107,7 +1107,7 @@ async def search_zotero(request: ZoteroSearchRequest):
         except Exception as e:
             logger.error(f"Zotero search failed: {e}")
             raise HTTPException(
-                status_code=500, detail=f"Zotero search failed: {str(e)}"
+                status_code=500, detail="Zotero search failed. Please try again later."
             )
 
         # Format results without triggering extra per-item attachment fetches
@@ -1121,7 +1121,7 @@ async def search_zotero(request: ZoteroSearchRequest):
 
             # Extract authors from creators using shared helper
             creators = data.get("creators", []) or []
-            authors = zotero_client._extract_authors_from_creators(creators)
+            authors = zotero_client.extract_authors_from_creators(creators)
 
             # Extract year from date field
             date_str = data.get("date", "")
@@ -1155,4 +1155,4 @@ async def search_zotero(request: ZoteroSearchRequest):
         raise
     except Exception as e:
         logger.error(f"Error searching Zotero: {str(e)}")
-        raise HTTPException(status_code=500, detail=f"Error searching Zotero: {str(e)}")
+        raise HTTPException(status_code=500, detail="Error searching Zotero. Please try again later.")
