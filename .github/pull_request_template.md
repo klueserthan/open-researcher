@@ -8,6 +8,10 @@
 
 Fixes #<!-- issue number -->
 
+## Target Branch
+
+PRs should target **dev** (integration/testing branch). Only urgent hotfixes may target **main** with clear justification. Please rebase against `dev` before opening the PR.
+
 ## Type of Change
 
 <!-- Mark the relevant option with an "x" -->
@@ -101,6 +105,7 @@ Before submitting, please verify:
 - [ ] This PR addresses an approved issue that was assigned to me
 - [ ] I have not included unrelated changes in this PR
 - [ ] My PR title follows conventional commits format (e.g., "feat: add user authentication")
+- [ ] This PR targets `dev` (integration branch) — or `main` only for a justified hotfix
 
 ---
 

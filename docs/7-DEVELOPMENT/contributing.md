@@ -1,5 +1,70 @@
 # Contributing to Open Notebook
 
+**📍 This file has moved!**
+
+All contribution guidelines have been consolidated into the new development documentation structure.
+
+👉 **[Read the Contributing Guide](docs/7-DEVELOPMENT/contributing.md)**
+
+---
+
+## Quick Links
+
+- **Want to contribute code?** → [Contributing Guide](docs/7-DEVELOPMENT/contributing.md)
+- **Want to understand the architecture?** → [Architecture Overview](docs/7-DEVELOPMENT/architecture.md)
+- **Want to understand our design philosophy?** → [Design Principles](docs/7-DEVELOPMENT/design-principles.md)
+- **Are you a maintainer?** → [Maintainer Guide](docs/7-DEVELOPMENT/maintainer-guide.md)
+- **New developer?** → [Quick Start](docs/7-DEVELOPMENT/quick-start.md)
+
+---
+
+## The Issue-First Workflow
+
+**TL;DR**: Create an issue first, get it assigned, THEN code.
+
+This prevents wasted effort and ensures your work aligns with the project. [See details →](docs/7-DEVELOPMENT/contributing.md)
+
+---
+
+For all contribution details, see **[docs/7-DEVELOPMENT/contributing.md](docs/7-DEVELOPMENT/contributing.md)**.
+
+## Branch Strategy & Protections
+
+We maintain a two-branch stability model:
+
+- **main**: Stable, production-ready. Protected.
+- **dev**: Integration branch for feature PRs. Kept green via CI.
+
+Recommended workflow:
+
+1. Branch from `dev` for each feature (`feature/xyz`).
+2. Open PRs targeting `dev` and ensure CI passes.
+3. Test on `dev` (manual + automated). Keep merges small and frequent.
+4. Merge `dev` → `main` only when CI is green and testing is successful.
+
+Branch protection (configure in GitHub → Settings → Branches):
+
+- Protect `main`:
+   - Require pull request before merging
+   - Require status checks to pass (select the CI workflow job)
+   - Dismiss stale reviews and block force pushes
+- Protect `dev` (optional but recommended):
+   - Require status checks to pass
+   - Disallow direct pushes (use PRs)
+
+CI validation gates (see `.github/workflows/ci.yml`):
+
+- `ruff check .` (lint)
+- `python -m mypy .` (type checks)
+- `pytest` (unit/integration tests)
+
+Release practice:
+
+- Tag releases on `main` (e.g., `v1.3.1`).
+- Use hotfix branches off `main` for urgent fixes and merge back into `dev`.
+
+# Contributing to Open Notebook
+
 Thank you for your interest in contributing to Open Notebook! We welcome contributions from developers of all skill levels. This guide will help you understand our contribution workflow and what makes a good contribution.
 
 ## 🚨 Issue-First Workflow
